@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.ts",
-  
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "tsx watch server.ts",
@@ -19,6 +18,8 @@
     "tsx": "^4.23.12"
   },
   "dependencies": {
+    "@apollo/server": "^5.5.1",
+    "@as-integrations/express4": "^1.1.2",
     "@types/cors": "^2.8.19",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.6",
@@ -26,7 +27,7 @@
     "@types/typescript": "^0.4.29",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1",
+    "express": "^4.22.2",
     "pg": "^8.23.0",
     "type-graphql": "^2.0.0-rc.3",
     "typeorm": "^1.1.0",
