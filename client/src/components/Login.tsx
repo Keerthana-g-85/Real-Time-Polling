@@ -56,7 +56,7 @@ export default function Login() {
   const userLoginMutation = useMutation({
     mutationFn: userLogin,
     onSuccess: () => {
-      navigate("/");
+      navigate("/home");
     },
   });
 
