@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import Users from "./models/UsersModel.js";
 import Poll from "./models/PollModel.js";
 import Options from "./models/OptionsModel.js";
+import Vote from "./models/VoteModel.js";
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ export const database = new DataSource({
   password: process.env.DB_PASSWORD as string,
   port: Number(process.env.DB_PORT),
   synchronize: false,
-  entities: [Users , Poll , Options],
+  entities: [Users , Poll , Options , Vote],
   migrations: ["./migrations/*.ts"],
 });
 
