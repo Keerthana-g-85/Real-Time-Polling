@@ -3,6 +3,8 @@ import { database } from "../database.js";
 import Users from "../models/UsersModel.js";
 import { GraphQLError } from "graphql";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import type LoginUser from "../arguments/users/LoginUserArguments.js";
 
 export default class UsersService {
   private usersRepo = database.getRepository(Users);
@@ -30,6 +32,35 @@ export default class UsersService {
         throw error;
       }
       throw new GraphQLError("Error while creating Users");
+    }
+  }
+
+  async loginUser({ email, password }: LoginUser) {
+    try {
+      const user = await this.usersRepo.findOneBy({ email: email });
+      if (!user) {
+        throw new GraphQLError("Email not yet registred");
+      }
+      const isPassword = await bcrypt.compare(password, user.password);
+      if (!isPassword) {
+        throw new GraphQLError("Invalid Password");
+      }
+      const accesstoken = jwt.sign(
+        { id: user.id, name: user.name, email: user.email },
+        process.env.JW_SECRET as string,
+        { expiresIn: "2hr" },
+      );
+      return {
+        success: true,
+        message: "User successfully logged in",
+        accesstoken,
+      };
+    } catch (error) {
+      console.log(error);
+      if (error instanceof GraphQLError) {
+        throw error;
+      }
+      throw new GraphQLError("Error while logging in ");
     }
   }
 

@@ -1,9 +1,9 @@
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
-import { request } from "graphql-request";
 import { useState } from "react";
 import { USER_REGISTER } from "../graphql/Mutation/USER_REGISTER";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import useApi from "../Api";
 
 export default function Register() {
   const [register, setRegister] = useState({
@@ -99,18 +99,14 @@ export default function Register() {
   }
 
   async function createRegister() {
-    const response = await request(
-      "http://localhost:3060/graphql",
-      USER_REGISTER,
-      {
-        input: {
-          name: register.name,
-          email: register.email,
-          password: register.password,
-        },
+    return await useApi({
+      query: USER_REGISTER,
+      input: {
+        name: register.name,
+        email: register.email,
+        password: register.password,
       },
-    );
-    return response;
+    });
   }
 
   const createUserMutation = useMutation({
