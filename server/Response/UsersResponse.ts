@@ -1,4 +1,5 @@
 import { Field, ObjectType } from "type-graphql";
+import Users from "../models/UsersModel.js";
 
 @ObjectType()
 export default class UsersResponse {
@@ -7,4 +8,7 @@ export default class UsersResponse {
 
   @Field(() => String)
   message!: string;
+
+  @Field(() => [Users] ,{nullable:true})
+  users?: Users[];
 }

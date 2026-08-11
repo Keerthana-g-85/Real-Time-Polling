@@ -1,5 +1,9 @@
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
+import { request } from "graphql-request";
 import { useState } from "react";
+import { USER_REGISTER } from "../graphql/Mutation/USER_REGISTER";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
 
 export default function Register() {
   const [register, setRegister] = useState({
@@ -17,6 +21,7 @@ export default function Register() {
     email: "",
     password: "",
   });
+  const navigate = useNavigate();
   function handleRegister() {
     try {
       if (!register.name) {
@@ -85,13 +90,36 @@ export default function Register() {
       ) {
         return;
       } else {
-        
+        createUserMutation.mutate();
       }
     } catch (error) {
       console.log(error);
       throw error;
     }
   }
+
+  async function createRegister() {
+    const response = await request(
+      "http://localhost:3060/graphql",
+      USER_REGISTER,
+      {
+        input: {
+          name: register.name,
+          email: register.email,
+          password: register.password,
+        },
+      },
+    );
+    return response;
+  }
+
+  const createUserMutation = useMutation({
+    mutationFn: createRegister,
+    onSuccess: () => {
+      navigate("/");
+    },
+  });
+
   return (
     <>
       <Box
@@ -138,7 +166,7 @@ export default function Register() {
             fullWidth
             id={err.password ? "outlined-error" : "outlined-basic"}
             variant="outlined"
-            type="text"
+            type="password"
             value={register.password}
             error={err.password}
             helperText={message.password}

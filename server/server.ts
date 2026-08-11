@@ -10,12 +10,12 @@ import UsersResolver from "./Resolvers/UsersResolver.js";
 dotenv.config();
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:5173/" }));
+app.use(cors({ origin: "http://localhost:5173" }));
 const schema = await buildSchema({ resolvers: [UsersResolver] });
 const server = new ApolloServer({ schema });
 server.start();
 await connection();
-app.use("graphql", express.json(), expressMiddleware(server));
+app.use("/graphql", express.json(), expressMiddleware(server));
 app.listen(process.env.PORT, () => {
-  console.log("Server Started");
+  console.log("Server Started",process.env.PORT);
 });
