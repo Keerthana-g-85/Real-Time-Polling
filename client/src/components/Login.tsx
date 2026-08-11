@@ -1,5 +1,9 @@
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
 import { useState } from "react";
+import useApi from "../Api";
+import { LOGIN_USER } from "../graphql/Mutation/LOGIN_USER";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
 
 export default function Login() {
   const [login, setLogin] = useState({ email: "", password: "" });
@@ -11,6 +15,7 @@ export default function Login() {
     email: "",
     password: "",
   });
+  const navigate = useNavigate();
   function handleLogin() {
     try {
       if (!login.email) {
@@ -24,11 +29,37 @@ export default function Login() {
           password: "Password is required",
         }));
       }
+
+      if (!login.email || !login.password) {
+        return;
+      } else {
+        userLoginMutation.mutate();
+      }
     } catch (error) {
       console.log(error);
       throw error;
     }
   }
+  async function userLogin() {
+    const response = await useApi({
+      query: LOGIN_USER,
+      input: {
+        email: login.email,
+        password: login.password,
+      },
+    });
+    console.log(response.loginUser);
+    localStorage.setItem("token", response.loginUser.accesstoken);
+    return response.loginUser;
+  }
+
+  const userLoginMutation = useMutation({
+    mutationFn: userLogin,
+    onSuccess: () => {
+      navigate("/");
+    },
+  });
+
   return (
     <>
       <Box
@@ -68,7 +99,13 @@ export default function Login() {
               setMessage({ ...message, password: "" });
             }}
           />
-          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <Button onClick={handleLogin} sx={{ mt: 3 }} variant="contained">
               Login
             </Button>
