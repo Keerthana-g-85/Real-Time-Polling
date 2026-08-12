@@ -5,6 +5,8 @@ import Poll from "../models/PollModel.js";
 import Users from "../models/UsersModel.js";
 import Options from "../models/OptionsModel.js";
 import type GetPollArguments from "../arguments/poll/GetPoll.js";
+import AllowedUser from "../models/AllowedUsersModel.js";
+import { In } from "typeorm";
 
 export default class PollService {
   private pollRepo = database.getRepository(Poll);
@@ -15,12 +17,14 @@ export default class PollService {
     expire_time,
     status,
     user_id,
+    allowed_users
   }: CreatePollArguments) {
     try {
       return await database.transaction(async (manager) => {
         const usersRepo = manager.getRepository(Users);
         const pollRepo = manager.getRepository(Poll);
         const optionsRepo = manager.getRepository(Options);
+        const allowedUserRepo = manager.getRepository(AllowedUser);
 
         const user = await usersRepo.findOneBy({ id: user_id });
         console.log(user);
@@ -46,6 +50,19 @@ export default class PollService {
           optionsRepo.create({ option, poll_id: poll }),
         );
         const option = await optionsRepo.save(createOptions);
+
+        const allowedUsers = await usersRepo.findBy({
+          id: In(allowed_users),
+        });
+
+        const createAllowedUsers = allowedUsers.map((allowedUser) =>
+          allowedUserRepo.create({
+            poll_id: poll,
+            user_id: allowedUser,
+          }),
+        );
+
+        await allowedUserRepo.save(createAllowedUsers);
 
         return {
           success: true,

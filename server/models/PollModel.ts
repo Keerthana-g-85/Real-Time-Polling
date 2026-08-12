@@ -11,6 +11,7 @@ import {
 } from "typeorm";
 import Users from "./UsersModel.js";
 import Options from "./OptionsModel.js";
+import AllowedUser from "./AllowedUsersModel.js";
 
 @ObjectType()
 @Entity()
@@ -36,6 +37,10 @@ export default class Poll {
   @OneToMany(() => Options, (options) => options.poll_id)
   @JoinColumn({ name: "option_id" })
   option_id!: Options[];
+
+  @Field(() => [AllowedUser])
+  @OneToMany(() => AllowedUser, (allowedUser) => allowedUser.poll_id)
+  allowed_users!: AllowedUser[];
 
   @Field(() => GraphQLISODateTime)
   @Column({ type: "timestamptz" })

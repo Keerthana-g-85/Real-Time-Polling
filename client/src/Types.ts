@@ -9,3 +9,8 @@ export interface Poll {
   status: string;
   option_id: Options[];
 }
+export interface Users {
+    id : string ,
+    name : string ,
+    email : string ,
+}

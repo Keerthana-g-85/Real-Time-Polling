@@ -1,15 +1,20 @@
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import {  useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import dayjs from "dayjs";
 import { DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import Autocomplete from "@mui/material/Autocomplete";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import useApi from "../Api";
 import { CREATE_POLL } from "../graphql/Mutation/CREATE_POLL";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
+import { GET_USERS } from "../graphql/Query/GET_USERS";
+import type { Users } from "../Types";
 
 export default function CreatePoll() {
   const [poll, setPoll] = useState({
@@ -17,8 +22,9 @@ export default function CreatePoll() {
     question: "",
     expireTime: dayjs(),
   });
-  const id = useSelector((state:any)=>state.login.user.id)
   const [options, setOptions] = useState(["", ""]);
+  const [allowedusers, setAllowedUsers] = useState<string[]>([]);
+  const id = useSelector((state: any) => state.login.user.id);
   async function handleCreatePoll() {
     const response = await useApi({
       query: CREATE_POLL,
@@ -27,6 +33,7 @@ export default function CreatePoll() {
         question: poll.question,
         expire_time: poll.expireTime,
         options: options,
+        allowed : allowedusers,
         status: "Active",
         user_id: id,
       },
@@ -37,6 +44,17 @@ export default function CreatePoll() {
   const optonsMutation = useMutation({
     mutationFn: handleCreatePoll,
     onSuccess: () => {},
+  });
+
+  async function handleGetUsers() {
+    const response = await useApi({ query: GET_USERS, input: {} });
+    console.log(response.getUsers.users);
+    return response.getUsers.users;
+  }
+
+  const { data: users } = useQuery({
+    queryKey: ["users"],
+    queryFn: handleGetUsers,
   });
 
   return (
@@ -106,7 +124,7 @@ export default function CreatePoll() {
           </Button>
 
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DemoItem label="DateTimePicker">
+            <DemoItem label="DateTimePicker" sx={{ mb: 2 }}>
               <DateTimePicker
                 disablePast
                 views={["year", "month", "day", "hours", "minutes"]}
@@ -121,6 +139,42 @@ export default function CreatePoll() {
               />
             </DemoItem>
           </LocalizationProvider>
+
+          <Autocomplete
+            multiple
+            options={users}
+            value={(users ?? [])?.filter((user: Users) =>
+              allowedusers.includes(user.id),
+            )}
+            onChange={(_, newValue) => {
+              setAllowedUsers(newValue.map((user) => user.id));
+              console.log(users);
+            }}
+            disableCloseOnSelect
+            getOptionLabel={(option: Users) => option.name}
+            renderOption={(props, option, { selected }) => {
+              const { key, ...optionProps } = props;
+
+              const SelectionIcon = selected
+                ? CheckBoxIcon
+                : CheckBoxOutlineBlankIcon;
+
+              return (
+                <li key={key} {...optionProps}>
+                  <SelectionIcon
+                    fontSize="small"
+                    style={{
+                      marginRight: 8,
+                      padding: 9,
+                      boxSizing: "content-box",
+                    }}
+                  />
+                  {option.name}
+                </li>
+              );
+            }}
+            renderInput={(params) => <TextField {...params} label="Users" />}
+          />
           <Button
             variant="contained"
             sx={{ mt: 1, mb: 1 }}
