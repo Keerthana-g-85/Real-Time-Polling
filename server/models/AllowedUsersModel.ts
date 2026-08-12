@@ -18,12 +18,12 @@ export default class AllowedUser {
   id!: string;
 
   @Field(() => Users)
-  @ManyToOne(() => Users)
+  @ManyToOne(() => Users, { onDelete: "CASCADE" })
   @JoinColumn({ name: "user_id" })
   user_id!: Users;
 
   @Field(() => Poll)
-  @ManyToOne(() => Poll)
+  @ManyToOne(() => Poll, { onDelete: "CASCADE" })
   @JoinColumn({ name: "poll_id" })
   poll_id!: Poll;
 

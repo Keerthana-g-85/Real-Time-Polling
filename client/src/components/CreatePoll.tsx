@@ -9,6 +9,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import useApi from "../Api";
 import { CREATE_POLL } from "../graphql/Mutation/CREATE_POLL";
 import { useMutation } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
 
 export default function CreatePoll() {
   const [poll, setPoll] = useState({
@@ -16,6 +17,7 @@ export default function CreatePoll() {
     question: "",
     expireTime: dayjs(),
   });
+  const id = useSelector((state:any)=>state.login.user.id)
   const [options, setOptions] = useState(["", ""]);
   async function handleCreatePoll() {
     const response = await useApi({
@@ -26,7 +28,7 @@ export default function CreatePoll() {
         expire_time: poll.expireTime,
         options: options,
         status: "Active",
-        user_id: "041f631f-4c2e-4f01-9d2b-b039ba72ed84",
+        user_id: id,
       },
     });
     console.log(response);

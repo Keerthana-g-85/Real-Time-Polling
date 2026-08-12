@@ -26,7 +26,7 @@ export default class Poll {
   question!: string;
 
   @Field(() => Users)
-  @ManyToOne(() => Users)
+  @ManyToOne(() => Users , {onDelete:"CASCADE"})
   @JoinColumn({ name: "user_id" })
   user_id!: Users;
 

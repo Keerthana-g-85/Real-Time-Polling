@@ -17,11 +17,11 @@ export default class Options{
   id!: string;
 
   @Field(() => Poll)
-  @ManyToOne(() => Poll)
+  @ManyToOne(() => Poll ,{onDelete:"CASCADE"})
   @JoinColumn({ name: "poll_id" })
   poll_id!: Poll;
 
-  @Field(() => String)
+  @Field(() => String )
   @Column({ type: "varchar" })
   option!: string;
 

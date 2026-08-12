@@ -19,17 +19,17 @@ export default class Vote {
   id!: string;
 
   @Field(() => Users)
-  @ManyToOne(() => Users)
+  @ManyToOne(() => Users, { onDelete: "CASCADE" })
   @JoinColumn({ name: "user_id" })
   user_id!: Users;
 
   @Field(() => Poll)
-  @ManyToOne(() => Poll)
+  @ManyToOne(() => Poll, { onDelete: "CASCADE" })
   @JoinColumn({ name: "poll_id" })
   poll_id!: Poll;
 
   @Field(() => Options)
-  @ManyToOne(() => Options)
+  @ManyToOne(() => Options, { onDelete: "CASCADE" })
   @JoinColumn({ name: "option_id" })
   option_id!: Options;
 
