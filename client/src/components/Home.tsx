@@ -22,15 +22,22 @@ export default function Home() {
       icon: <HomeIcon />,
       path: "/home",
     },
+    {
+      text: "Create Poll",
+      icon: <HomeIcon />,
+      path: "/create_poll",
+    },
   ];
 
   return (
     <>
-      <Box>
+      <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <AppBar
           position="fixed"
           sx={{
+            width: `calc(100% - ${drawerWidth}px)`,
+            ml: `${drawerWidth}px`,
             zIndex: (theme) => theme.zIndex.drawer + 1,
           }}
         >
