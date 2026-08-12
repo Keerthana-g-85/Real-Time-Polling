@@ -3,6 +3,7 @@ import Register from "./components/Register";
 import Login from "./components/Login";
 import Home from "./components/Home";
 import CreatePoll from "./components/CreatePoll";
+import ActivePoll from "./components/ActivePoll";
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
           <Route element={<Home />}>
             <Route path="/home" element={<Home />} />
             <Route path="/create_poll" element={<CreatePoll />} />
+            <Route path="/active_poll" element={<ActivePoll />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -5,10 +5,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import Users from "./UsersModel.js";
+import Options from "./OptionsModel.js";
 
 @ObjectType()
 @Entity()
@@ -26,9 +28,14 @@ export default class Poll {
   question!: string;
 
   @Field(() => Users)
-  @ManyToOne(() => Users , {onDelete:"CASCADE"})
+  @ManyToOne(() => Users, { onDelete: "CASCADE" })
   @JoinColumn({ name: "user_id" })
   user_id!: Users;
+
+  @Field(() => [Options])
+  @OneToMany(() => Options, (options) => options.poll_id)
+  @JoinColumn({ name: "option_id" })
+  option_id!: Options[];
 
   @Field(() => GraphQLISODateTime)
   @Column({ type: "timestamptz" })

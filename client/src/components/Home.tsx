@@ -27,6 +27,11 @@ export default function Home() {
       icon: <HomeIcon />,
       path: "/create_poll",
     },
+    {
+      text: "Active Poll",
+      icon: <HomeIcon />,
+      path: "/active_poll",
+    },
   ];
 
   return (

@@ -65,7 +65,9 @@ export default class PollService {
     try {
       let polls;
       console.log(new Date());
-      const poll = await this.pollRepo.find({ relations: { user_id: true } });
+      const poll = await this.pollRepo.find({
+        relations: { user_id: true, option_id: true },
+      });
       if (status === "Active") {
         polls = poll.filter((i) => i.expire_time > new Date());
         console.log(polls);
