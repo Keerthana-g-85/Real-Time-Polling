@@ -6,6 +6,9 @@ import { DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import useApi from "../Api";
+import { CREATE_POLL } from "../graphql/Mutation/CREATE_POLL";
+import { useMutation } from "@tanstack/react-query";
 
 export default function CreatePoll() {
   const [poll, setPoll] = useState({
@@ -14,6 +17,26 @@ export default function CreatePoll() {
     expireTime: dayjs(),
   });
   const [options, setOptions] = useState(["", ""]);
+  async function handleCreatePoll() {
+    const response = await useApi({
+      query: CREATE_POLL,
+      input: {
+        poll_name: poll.name,
+        question: poll.question,
+        expire_time: poll.expireTime,
+        options: options,
+        status: "Active",
+        user_id: "041f631f-4c2e-4f01-9d2b-b039ba72ed84",
+      },
+    });
+    console.log(response);
+    return response;
+  }
+  const optonsMutation = useMutation({
+    mutationFn: handleCreatePoll,
+    onSuccess: () => {},
+  });
+
   return (
     <>
       <Box
@@ -26,10 +49,22 @@ export default function CreatePoll() {
       >
         <Paper elevation={4} sx={{ width: 600, height: 700, p: 4 }}>
           <Typography>Name</Typography>
-          <TextField fullWidth value={poll.name} />
+          <TextField
+            fullWidth
+            value={poll.name}
+            onChange={(e) =>
+              setPoll((prev) => ({ ...prev, name: e.target.value }))
+            }
+          />
 
           <Typography>Question</Typography>
-          <TextField fullWidth value={poll.question} />
+          <TextField
+            fullWidth
+            value={poll.question}
+            onChange={(e) => {
+              setPoll((prev) => ({ ...prev, question: e.target.value }));
+            }}
+          />
 
           <Typography>Options</Typography>
           {options.map((item, index) => (
@@ -60,7 +95,11 @@ export default function CreatePoll() {
               )}
             </Box>
           ))}
-          <Button variant="contained" onClick={() => setOptions((prev) => [...prev, ""])} sx={{mt:1 , mb:1}}>
+          <Button
+            variant="contained"
+            onClick={() => setOptions((prev) => [...prev, ""])}
+            sx={{ mt: 1, mb: 1 }}
+          >
             Options +
           </Button>
 
@@ -71,7 +110,6 @@ export default function CreatePoll() {
                 views={["year", "month", "day", "hours", "minutes"]}
                 defaultValue={dayjs()}
                 value={poll.expireTime}
-                
                 onChange={(e) => {
                   setPoll((prev) => ({
                     ...prev,
@@ -81,7 +119,15 @@ export default function CreatePoll() {
               />
             </DemoItem>
           </LocalizationProvider>
-          <Button variant="contained" sx={{mt:1 , mb:1}}>Create</Button>
+          <Button
+            variant="contained"
+            sx={{ mt: 1, mb: 1 }}
+            onClick={() => {
+              optonsMutation.mutate();
+            }}
+          >
+            Create
+          </Button>
         </Paper>
       </Box>
     </>
