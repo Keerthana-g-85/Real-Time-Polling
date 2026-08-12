@@ -4,6 +4,7 @@ import { database } from "../database.js";
 import Poll from "../models/PollModel.js";
 import Users from "../models/UsersModel.js";
 import Options from "../models/OptionsModel.js";
+import type GetPollArguments from "../arguments/poll/GetPoll.js";
 
 export default class PollService {
   private pollRepo = database.getRepository(Poll);
@@ -51,6 +52,38 @@ export default class PollService {
           message: "Poll successfully created",
         };
       });
+    } catch (error) {
+      console.log(error);
+      if (error instanceof GraphQLError) {
+        throw error;
+      }
+      throw new GraphQLError("Error while creating Users");
+    }
+  }
+
+  async getPoll({ status, user_id }: GetPollArguments) {
+    try {
+      let polls;
+      console.log(new Date());
+      const poll = await this.pollRepo.find({ relations: { user_id: true } });
+      if (status === "Active") {
+        polls = poll.filter((i) => i.expire_time > new Date());
+        console.log(polls);
+      } else if (status === "Completed") {
+        polls = poll.filter((i) => i.expire_time < new Date());
+        console.log(polls);
+      } else {
+        polls = poll;
+      }
+
+      if (user_id) {
+        polls = polls.filter((i) => i.user_id.id === user_id);
+      }
+      return {
+        success: true,
+        message: "All polls",
+        polls,
+      };
     } catch (error) {
       console.log(error);
       if (error instanceof GraphQLError) {

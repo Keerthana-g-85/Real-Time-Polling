@@ -1,4 +1,5 @@
 import { Field, ObjectType } from "type-graphql";
+import Poll from "../models/PollModel.js";
 
 @ObjectType()
 export default class PollResponse {
@@ -8,4 +9,6 @@ export default class PollResponse {
   @Field(() => String)
   message!: string;
 
+  @Field(() => [Poll], { nullable: true })
+  polls!: Poll[];
 }
