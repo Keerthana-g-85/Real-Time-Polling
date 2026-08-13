@@ -7,16 +7,22 @@ import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@as-integrations/express4";
 import UsersResolver from "./Resolvers/UsersResolver.js";
 import PollResolver from "./Resolvers/PollResolver.js";
+import { createServer } from "http";
+import { WebSocketServer } from "ws";
 
 dotenv.config();
 const app = express();
+const httpServer = createServer(app);
+const wss = new WebSocketServer({
+  server: httpServer,
+});
 app.use(express.json());
 app.use(cors({ origin: "http://localhost:5173" }));
-const schema = await buildSchema({ resolvers: [UsersResolver ,PollResolver] });
+const schema = await buildSchema({ resolvers: [UsersResolver, PollResolver] });
 const server = new ApolloServer({ schema });
-server.start();
+await server.start();
 await connection();
 app.use("/graphql", express.json(), expressMiddleware(server));
-app.listen(process.env.PORT, () => {
-  console.log("Server Started",process.env.PORT);
+httpServer.listen(process.env.PORT, () => {
+  console.log("Server Started", process.env.PORT);
 });
