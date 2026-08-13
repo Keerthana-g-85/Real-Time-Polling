@@ -27,7 +27,7 @@ export default class PollService {
         const allowedUserRepo = manager.getRepository(AllowedUser);
 
         const user = await usersRepo.findOneBy({ id: user_id });
-        console.log(user);
+        // console.log(user);
         if (!user) {
           throw new GraphQLError("No user exist");
         }
@@ -81,7 +81,7 @@ export default class PollService {
   async getPoll({ status, user_id }: GetPollArguments) {
     try {
       let polls;
-      console.log(new Date());
+      // console.log(new Date());
       const poll = await this.pollRepo.find({
         relations: {
           user_id: true,
@@ -93,10 +93,10 @@ export default class PollService {
       });
       if (status === "Active") {
         polls = poll.filter((i) => i.expire_time > new Date());
-        console.log(polls);
+        // console.log(polls);
       } else if (status === "Completed") {
         polls = poll.filter((i) => i.expire_time < new Date());
-        console.log(polls);
+        // console.log(polls);
       } else {
         polls = poll;
       }
