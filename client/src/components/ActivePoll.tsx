@@ -6,12 +6,14 @@ import type { Options, Poll } from "../Types";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import { useSelector } from "react-redux";
 
 export default function ActivePoll() {
+  const id = useSelector((state:any)=>state.login.user.id)
   async function getActivePolls() {
     const response = await useApi({
       query: GET_ACTIVE_POOLS,
-      input: { status: "Active" },
+      variables: { status: "Active" , userId : id},
     });
     console.log(response.getPoll.polls);
     return response.getPoll.polls;

@@ -1,8 +1,8 @@
 import { gql } from "graphql-request";
 
 export const GET_ACTIVE_POOLS = gql`
-  query GetPoll($status: String) {
-    getPoll(status: $status) {
+  query GetPoll($status: String, $userId: ID) {
+    getPoll(status: $status, user_id: $userId) {
       success
       message
       polls {
@@ -16,10 +16,13 @@ export const GET_ACTIVE_POOLS = gql`
           name
           email
         }
-           option_id {
-        option
-        id
-      }
+        option_id {
+          option
+          id
+        }
+        allowed_users {
+          id
+        }
       }
     }
   }

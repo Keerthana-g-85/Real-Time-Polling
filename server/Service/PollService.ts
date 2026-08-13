@@ -17,7 +17,7 @@ export default class PollService {
     expire_time,
     status,
     user_id,
-    allowed_users
+    allowed_users,
   }: CreatePollArguments) {
     try {
       return await database.transaction(async (manager) => {
@@ -83,7 +83,13 @@ export default class PollService {
       let polls;
       console.log(new Date());
       const poll = await this.pollRepo.find({
-        relations: { user_id: true, option_id: true },
+        relations: {
+          user_id: true,
+          option_id: true,
+          allowed_users: {
+            user_id: true,
+          },
+        },
       });
       if (status === "Active") {
         polls = poll.filter((i) => i.expire_time > new Date());
@@ -96,7 +102,13 @@ export default class PollService {
       }
 
       if (user_id) {
-        polls = polls.filter((i) => i.user_id.id === user_id);
+        polls = polls.filter(
+          (poll) =>
+            poll.user_id.id === user_id ||
+            poll.allowed_users.some(
+              (allowedUser) => allowedUser.user_id.id === user_id,
+            ),
+        );
       }
       return {
         success: true,
@@ -108,7 +120,7 @@ export default class PollService {
       if (error instanceof GraphQLError) {
         throw error;
       }
-      throw new GraphQLError("Error while creating Users");
+      throw new GraphQLError("Error while getting Users");
     }
   }
 }

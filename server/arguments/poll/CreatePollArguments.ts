@@ -20,6 +20,6 @@ export default class CreatePollArguments {
   @Field(()=>ID)
   user_id! : string
 
-  @Field(() => String)
+  @Field(() => [String])
   allowed_users! : string[]
 }

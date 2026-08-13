@@ -33,7 +33,7 @@ export default function CreatePoll() {
         question: poll.question,
         expire_time: poll.expireTime,
         options: options,
-        allowed : allowedusers,
+        allowed_users : allowedusers,
         status: "Active",
         user_id: id,
       },
