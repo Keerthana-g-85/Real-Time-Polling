@@ -4,8 +4,19 @@ import Login from "./components/Login";
 import Home from "./components/Home";
 import CreatePoll from "./components/CreatePoll";
 import ActivePoll from "./components/ActivePoll";
+import { useEffect } from "react";
 
 export default function App() {
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:3060");
+    socket.onmessage =(event)=>{
+      console.log(event.data)
+    }
+
+    socket.onopen = () =>{
+      socket.send("Message from client")
+    }
+  }, []);
   return (
     <>
       <BrowserRouter>

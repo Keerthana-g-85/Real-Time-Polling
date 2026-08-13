@@ -16,6 +16,14 @@ const httpServer = createServer(app);
 const wss = new WebSocketServer({
   server: httpServer,
 });
+wss.on("connection", (socket) => {
+  console.log("client connected");
+  socket.send("From server a message")
+
+  socket.on("message", (message) => {
+  console.log(message.toString());
+});
+});
 app.use(express.json());
 app.use(cors({ origin: "http://localhost:5173" }));
 const schema = await buildSchema({ resolvers: [UsersResolver, PollResolver] });
