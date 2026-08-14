@@ -1,12 +1,8 @@
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useApi from "../Api";
 import { GET_ACTIVE_POOLS } from "../graphql/Query/GET_ACTIVE_POLLS";
 import { Box, Button, Card, Typography } from "@mui/material";
-import type { Options, Poll, VoteCount, } from "../Types";
+import type { Options, Poll, VoteCount } from "../Types";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -14,6 +10,8 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { CREATE_VOTE } from "../graphql/Mutation/CREATE_VOTE";
 import { GET_VOTED_POLLS } from "../graphql/Query/GET_VOTED_POLLS";
+import { LineChart } from "@mui/x-charts/LineChart";
+import Grid from "@mui/material/Grid";
 
 export default function ActivePoll() {
   const [option, setOption] = useState("");
@@ -136,13 +134,39 @@ export default function ActivePoll() {
               </Button>
             ) : (
               <>
-                {Object.entries(
-                  votedPolls[data.id] as VoteCount
-                ).map(([option, count] ) => (
-                  <Typography key={option}>
-                    {option}: {count} votes
-                  </Typography>
-                ))}
+                {Object.entries(votedPolls[data.id] as VoteCount).map(
+                  ([option, count]) => (
+                    <Typography key={option}>
+                      {option}: {count} votes
+                    </Typography>
+                  ),
+                )}
+                <Grid size={8}>
+                  <LineChart
+                    xAxis={[
+                      {
+                        scaleType: "point",
+                        data: data.option_id.map(
+                          (option: Options) => option.option,
+                        ),
+                      },
+                    ]}
+                    series={[
+                      {
+                        data: data.option_id.map((option: Options) => {
+                          return (
+                            (votedPolls[data.id] as VoteCount)?.[
+                              option.option
+                            ] ?? 0
+                          );
+                        }),
+                        label: "Votes",
+                      },
+                    ]}
+                    height={300}
+                    width={700}
+                  />
+                </Grid>
               </>
             )}
           </Card>
