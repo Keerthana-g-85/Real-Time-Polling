@@ -11,11 +11,14 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { Outlet, useNavigate } from "react-router";
 import HomeIcon from "@mui/icons-material/Home";
+import { useDispatch } from "react-redux";
+import { addToken } from "../redux/LoginSlice";
 
 const drawerWidth = 240;
 
 export default function Home() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const menuItems = [
     {
       text: "Home",
@@ -32,8 +35,13 @@ export default function Home() {
       icon: <HomeIcon />,
       path: "/active_poll",
     },
+    { text: "Logout", icon: <HomeIcon />, path: "" },
   ];
-
+  function handleLogout() {
+    localStorage.removeItem("token");
+    dispatch(addToken(""));
+    navigate("/", { replace: true });
+  }
   return (
     <>
       <Box sx={{ display: "flex" }}>
@@ -75,7 +83,15 @@ export default function Home() {
             <List>
               {menuItems.map((item) => (
                 <ListItem key={item.text}>
-                  <ListItemButton onClick={() => navigate(item.path)}>
+                  <ListItemButton
+                    onClick={() => {
+                      if (item.text === "Logout") {
+                        handleLogout();
+                      } else {
+                        navigate(item.path);
+                      }
+                    }}
+                  >
                     <ListItemIcon>{item.icon}</ListItemIcon>
                     <ListItemText primary={item.text} />
                   </ListItemButton>
