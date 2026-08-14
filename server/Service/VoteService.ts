@@ -22,25 +22,35 @@ export default class VoteService {
       if (!poll) {
         throw new GraphQLError("No poll present");
       }
-      const option = await this.optionRepo.findOneBy({ id: option_id});
+      const option = await this.optionRepo.findOneBy({ id: option_id });
       if (!option) {
         throw new GraphQLError("No option present");
+      }
+      const voteExist = await this.voteRepo.findOne({
+        where: {
+          user_id: { id: user_id },
+          poll_id: { id: poll_id },
+        },
+      });
+
+      if (voteExist) {
+        throw new GraphQLError("Vote already present");
       }
       const vote = this.voteRepo.create({
         user_id: user,
         poll_id: poll,
         option_id: option,
       });
-      await this.voteRepo.save(vote)
-      console.log("Vote saved, notifying for the :", poll_id , poll.poll_name);
+      await this.voteRepo.save(vote);
+      console.log("Vote saved, notifying for the :", poll_id, poll.poll_name);
       notifyPollUpdated(poll_id);
       return {
-        success : true ,
-        message : "Vote registered"
-      }
+        success: true,
+        message: "Vote registered",
+      };
     } catch (error) {
-        console.error(error);
-        if (error instanceof GraphQLError) {
+      console.error(error);
+      if (error instanceof GraphQLError) {
         throw error;
       }
       throw new GraphQLError("Error while creating votes");
