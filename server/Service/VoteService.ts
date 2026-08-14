@@ -7,6 +7,7 @@ import Users from "../models/UsersModel.js";
 import Vote from "../models/VoteModel.js";
 import { notifyPollUpdated } from "./WebSocketService.js";
 import type { Result } from "./WebSocketService.js";
+import type GetVoteUsersPollArguments from "../arguments/vote/GetVoteUserArguments.js";
 
 export default class VoteService {
   private usersRepo = database.getRepository(Users);
@@ -44,7 +45,6 @@ export default class VoteService {
       });
       await this.voteRepo.save(vote);
       console.log("Vote saved, notifying for the :", poll_id, poll.poll_name);
-      await this.voteRepo.save(vote);
 
       const votes = await this.voteRepo.find({
         where: {
@@ -92,6 +92,65 @@ export default class VoteService {
         throw error;
       }
       throw new GraphQLError("Error while creating votes");
+    }
+  }
+
+  async getVoteUserPoll({ user_id }: GetVoteUsersPollArguments) {
+    try {
+      const userPoll = await this.voteRepo.find({
+        where: {
+          user_id: { id: user_id },
+        },
+        relations: {
+          poll_id: true,
+        },
+      });
+
+      const pollId = userPoll.map((vote) => vote.poll_id.id);
+
+      if (pollId.length === 0) {
+        return {
+          success: true,
+          message: "User has not voted in any poll",
+          results: {},
+        };
+      }
+
+      const votes = await this.voteRepo.find({
+        where: pollId.map((pollId) => ({
+          poll_id: { id: pollId },
+        })),
+        relations: {
+          poll_id: true,
+          option_id: true,
+        },
+      });
+
+      const results = votes.reduce<Record<string, Record<string, number>>>(
+        (result, vote) => {
+          const option = vote.option_id.option;
+          const pollId = vote.poll_id.id;
+          if (!result[pollId]) {
+            result[pollId] = {};
+          }
+          if (!result[pollId][option]) {
+            result[pollId][option] = 0;
+          }
+          result[pollId][option]++;
+
+          return result;
+        },
+        {},
+      );
+
+      return {
+        success: true,
+        message: "All polls voted",
+        results,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new GraphQLError("Error while getting voted polls");
     }
   }
 }

@@ -1,18 +1,25 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import useApi from "../Api";
 import { GET_ACTIVE_POOLS } from "../graphql/Query/GET_ACTIVE_POLLS";
 import { Box, Button, Card, Typography } from "@mui/material";
-import type { Options, Poll } from "../Types";
+import type { Options, Poll, VoteCount, } from "../Types";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { CREATE_VOTE } from "../graphql/Mutation/CREATE_VOTE";
+import { GET_VOTED_POLLS } from "../graphql/Query/GET_VOTED_POLLS";
 
 export default function ActivePoll() {
   const [option, setOption] = useState("");
+  const queryClient = useQueryClient();
   const id = useSelector((state: any) => state.login.user.id);
+
   async function getActivePolls() {
     const response = await useApi({
       query: GET_ACTIVE_POOLS,
@@ -25,11 +32,10 @@ export default function ActivePoll() {
     queryKey: ["active"],
     queryFn: getActivePolls,
   });
+
   useEffect(() => {
     if (!activePoll) return;
-
     const socket = new WebSocket("ws://localhost:3060");
-
     socket.onopen = () => {
       activePoll.forEach((poll: Poll) => {
         console.log("Joining poll:", poll.id);
@@ -41,7 +47,6 @@ export default function ActivePoll() {
         );
       });
     };
-
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
@@ -51,11 +56,26 @@ export default function ActivePoll() {
         console.log("Results:", data.results);
       }
     };
-
     return () => {
       socket.close();
     };
   }, [activePoll?.map((poll: Poll) => poll.id).join(","), refetch]);
+
+  async function getVotedPolls() {
+    const response = await useApi({
+      query: GET_VOTED_POLLS,
+      variables: {
+        userId: id,
+      },
+    });
+    console.log(response.getVoteUserPoll);
+    return response.getVoteUserPoll.results;
+  }
+
+  const { data: votedPolls } = useQuery({
+    queryKey: ["votedPolls", id],
+    queryFn: getVotedPolls,
+  });
 
   async function handleSubmit(poll_id: string) {
     if (!option) {
@@ -78,6 +98,11 @@ export default function ActivePoll() {
 
   const voteMutation = useMutation({
     mutationFn: handleSubmit,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["votedPolls", id],
+      });
+    },
   });
 
   return (
@@ -102,12 +127,24 @@ export default function ActivePoll() {
               ))}
             </RadioGroup>
 
-            <Button
-              variant="contained"
-              onClick={() => voteMutation.mutate(data.id)}
-            >
-              Submit
-            </Button>
+            {!votedPolls?.[data.id] ? (
+              <Button
+                variant="contained"
+                onClick={() => voteMutation.mutate(data.id)}
+              >
+                Submit
+              </Button>
+            ) : (
+              <>
+                {Object.entries(
+                  votedPolls[data.id] as VoteCount
+                ).map(([option, count] ) => (
+                  <Typography key={option}>
+                    {option}: {count} votes
+                  </Typography>
+                ))}
+              </>
+            )}
           </Card>
         </Box>
       ))}

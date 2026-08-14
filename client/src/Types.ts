@@ -10,7 +10,15 @@ export interface Poll {
   option_id: Options[];
 }
 export interface Users {
-    id : string ,
-    name : string ,
-    email : string ,
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface VoteCount {
+  [option: string]: number;
+}
+
+export interface Result {
+  [pollId: string]: VoteCount;
 }
