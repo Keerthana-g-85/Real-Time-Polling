@@ -85,7 +85,9 @@ export default class PollService {
       const poll = await this.pollRepo.find({
         relations: {
           user_id: true,
-          option_id: true,
+          option_id: {
+            votes: true,
+          },
           allowed_users: {
             user_id: true,
           },

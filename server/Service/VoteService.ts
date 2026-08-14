@@ -5,6 +5,7 @@ import Options from "../models/OptionsModel.js";
 import Poll from "../models/PollModel.js";
 import Users from "../models/UsersModel.js";
 import Vote from "../models/VoteModel.js";
+import { notifyPollUpdated } from "./WebSocketService.js";
 
 export default class VoteService {
   private usersRepo = database.getRepository(Users);
@@ -31,11 +32,17 @@ export default class VoteService {
         option_id: option,
       });
       await this.voteRepo.save(vote)
+      console.log("Vote saved, notifying for the :", poll_id , poll.poll_name);
+      notifyPollUpdated(poll_id);
       return {
         success : true ,
         message : "Vote registered"
       }
     } catch (error) {
+        console.error(error);
+        if (error instanceof GraphQLError) {
+        throw error;
+      }
       throw new GraphQLError("Error while creating votes");
     }
   }

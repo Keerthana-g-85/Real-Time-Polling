@@ -11,32 +11,10 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { Outlet, useNavigate } from "react-router";
 import HomeIcon from "@mui/icons-material/Home";
-import { useEffect, useState } from "react";
 
 const drawerWidth = 240;
 
 export default function Home() {
-  const [socket, setSocket] = useState<WebSocket | null>(null);
-  useEffect(() => {
-    const socket = new WebSocket("ws://localhost:3060");
-    setSocket(socket);
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-
-      if (data.type === "POLL_UPDATED") {
-        console.log("Poll updated:", data.pollId);
-      }
-    };
-
-    socket.onopen = () => {
-      socket.send(
-        JSON.stringify({
-          type: "JOIN_POLL",
-          pollId: "123",
-        }),
-      );
-    }; 
-  }, []);
   const navigate = useNavigate();
   const menuItems = [
     {
@@ -58,18 +36,6 @@ export default function Home() {
 
   return (
     <>
-      <button
-        onClick={() => {
-          socket?.send(
-            JSON.stringify({
-              type: "VOTE",
-              pollId: "123",
-            }),
-          );
-        }}
-      >
-        Test Vote
-      </button>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <AppBar

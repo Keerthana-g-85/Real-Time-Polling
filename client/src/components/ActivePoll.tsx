@@ -7,6 +7,7 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
 export default function ActivePoll() {
   const id = useSelector((state:any)=>state.login.user.id)
@@ -18,10 +19,42 @@ export default function ActivePoll() {
     console.log(response.getPoll.polls);
     return response.getPoll.polls;
   }
-  const { data: activePoll } = useQuery({
+  const { data: activePoll ,refetch  } = useQuery({
     queryKey: ["active"],
     queryFn: getActivePolls,
   });
+  useEffect(() => {
+    
+  if (!activePoll) return;
+
+  const socket = new WebSocket("ws://localhost:3060");
+
+  socket.onopen = () => {
+    activePoll.forEach((poll : Poll) => {
+      console.log("Joining poll:", poll.id);
+      socket.send(
+        JSON.stringify({
+          type: "POLL",
+          pollId: poll.id,
+        }),
+        
+      );
+    });
+  };
+
+  socket.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+
+  if (data.type === "POLL_UPDATED") {
+    refetch();
+    console.log("Poll updated:", data.pollId);
+  }
+  };
+
+  return () => {
+    socket.close();
+  };
+}, [activePoll?.map((poll:Poll) => poll.id).join(","), refetch]);
   return (
     <>
       {activePoll?.map((data: Poll) => (
