@@ -1,7 +1,10 @@
 import { WebSocket } from "ws";
 
 const pollUsers = new Map<string, Set<WebSocket>>();
-
+export interface Result {
+option : string ,
+count : number
+}
 export const joinPoll = (pollId: string, socket: WebSocket) => {
   if (!pollUsers.has(pollId)) {
     pollUsers.set(pollId, new Set());
@@ -9,10 +12,16 @@ export const joinPoll = (pollId: string, socket: WebSocket) => {
 
   pollUsers.get(pollId)?.add(socket);
 
-  console.log("Joined polls" ,"poll:", pollId, "users socket :", pollUsers.get(pollId)?.size);
+  console.log(
+    "Joined polls",
+    "poll:",
+    pollId,
+    "users socket :",
+    pollUsers.get(pollId)?.size,
+  );
 };
 
-export const notifyPollUpdated = (pollId: string) => {
+export const notifyPollUpdated = (pollId: string, results: Result[]) => {
   console.log("which poll changed:", pollId);
   console.log("voted ppl:", pollUsers.get(pollId)?.size);
   pollUsers.get(pollId)?.forEach((data) => {
@@ -20,6 +29,7 @@ export const notifyPollUpdated = (pollId: string) => {
       JSON.stringify({
         type: "POLL_UPDATED",
         pollId,
+        results,
       }),
     );
   });

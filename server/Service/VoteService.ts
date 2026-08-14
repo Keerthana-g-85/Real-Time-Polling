@@ -6,6 +6,7 @@ import Poll from "../models/PollModel.js";
 import Users from "../models/UsersModel.js";
 import Vote from "../models/VoteModel.js";
 import { notifyPollUpdated } from "./WebSocketService.js";
+import type { Result } from "./WebSocketService.js";
 
 export default class VoteService {
   private usersRepo = database.getRepository(Users);
@@ -43,7 +44,44 @@ export default class VoteService {
       });
       await this.voteRepo.save(vote);
       console.log("Vote saved, notifying for the :", poll_id, poll.poll_name);
-      notifyPollUpdated(poll_id);
+      await this.voteRepo.save(vote);
+
+      const votes = await this.voteRepo.find({
+        where: {
+          poll_id: { id: poll_id },
+        },
+        relations: {
+          option_id: true,
+        },
+      });
+      console.log(votes);
+
+      //   const results= {};
+
+      //   votes.forEach((vote) => {
+      //     const option = vote.option_id.option;
+
+      //     if (results[option]) {
+      //       results[option]++;
+      //     } else {
+      //       results[option] = 1;
+      //     }
+      //   });
+
+      const results = votes.reduce<Result[]>((result, vote) => {
+        const option = vote.option_id.option;
+        const exist = result.find((item) => item.option === option);
+        if (exist) {
+          exist.count++;
+        } else {
+          result.push({
+            option,
+            count: 1,
+          });
+        }
+        return result;
+      }, []);
+      notifyPollUpdated(poll_id, results);
       return {
         success: true,
         message: "Vote registered",

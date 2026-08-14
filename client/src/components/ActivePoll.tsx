@@ -48,6 +48,7 @@ export default function ActivePoll() {
       if (data.type === "POLL_UPDATED") {
         refetch();
         console.log("Poll updated:", data.pollId);
+        console.log("Results:", data.results);
       }
     };
 
@@ -72,12 +73,12 @@ export default function ActivePoll() {
       },
     });
     console.log(response);
-    return response
+    return response;
   }
 
   const voteMutation = useMutation({
-    mutationFn : handleSubmit
-  })
+    mutationFn: handleSubmit,
+  });
 
   return (
     <>
@@ -101,7 +102,10 @@ export default function ActivePoll() {
               ))}
             </RadioGroup>
 
-            <Button variant="contained" onClick={() => voteMutation.mutate(data.id)}>
+            <Button
+              variant="contained"
+              onClick={() => voteMutation.mutate(data.id)}
+            >
               Submit
             </Button>
           </Card>
