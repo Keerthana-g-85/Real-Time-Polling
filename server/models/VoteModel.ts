@@ -5,6 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from "typeorm";
 import Users from "./UsersModel.js";
@@ -21,6 +22,7 @@ export default class Vote {
   @Field(() => Users)
   @ManyToOne(() => Users, { onDelete: "CASCADE" })
   @JoinColumn({ name: "user_id" })
+  @Unique(["user_id", "poll_id"])
   user_id!: Users;
 
   @Field(() => Poll)

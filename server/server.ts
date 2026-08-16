@@ -1,3 +1,5 @@
+import cookieParser from "cookie-parser";
+import jwt from "jsonwebtoken";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -11,6 +13,7 @@ import { createServer } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import VoteResolver from "./Resolvers/VoteResolver.js";
 import { joinPoll, leavePolls } from "./Service/WebSocketService.js";
+import type { AuthContext, AuthUser } from "./types.js";
 
 dotenv.config();
 const app = express();
@@ -18,6 +21,7 @@ const httpServer = createServer(app);
 const wss = new WebSocketServer({
   server: httpServer,
 });
+app.use(cookieParser());
 wss.on("connection", (socket) => {
   console.log("client connected");
 
@@ -36,14 +40,34 @@ wss.on("connection", (socket) => {
 });
 
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({ origin: "http://localhost:5173" , credentials: true, }));
 const schema = await buildSchema({
   resolvers: [UsersResolver, PollResolver, VoteResolver],
 });
 const server = new ApolloServer({ schema });
 await server.start();
 await connection();
-app.use("/graphql", express.json(), expressMiddleware(server));
+// app.use("/graphql", express.json(), expressMiddleware(server));
+app.use(
+  "/graphql",
+  express.json(),
+  expressMiddleware(server, {
+    context: async ({ req, res }): Promise<AuthContext> => {
+      let user: AuthUser | null = null;
+      const token = req.cookies?.token;
+
+      if (token) {
+        try {
+          user = jwt.verify(token, process.env.JW_SECRET as string) as AuthUser;
+        } catch {
+          user = null;
+        }
+      }
+
+      return { user, req, res };
+    },
+  }),
+);
 httpServer.listen(process.env.PORT, () => {
   console.log("Server Started", process.env.PORT);
 });

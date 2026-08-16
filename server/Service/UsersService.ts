@@ -5,6 +5,7 @@ import { GraphQLError } from "graphql";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import type LoginUser from "../arguments/users/LoginUserArguments.js";
+import type { Response } from "express";
 
 export default class UsersService {
   private usersRepo = database.getRepository(Users);
@@ -35,7 +36,7 @@ export default class UsersService {
     }
   }
 
-  async loginUser({ email, password }: LoginUser) {
+  async loginUser({ email, password }: LoginUser, res: Response) {
     try {
       const user = await this.usersRepo.findOneBy({ email: email });
       if (!user) {
@@ -50,6 +51,12 @@ export default class UsersService {
         process.env.JW_SECRET as string,
         { expiresIn: "2hr" },
       );
+      res.cookie("token", accesstoken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 2 * 60 * 60 * 1000,
+      });
       return {
         success: true,
         message: "User successfully logged in",

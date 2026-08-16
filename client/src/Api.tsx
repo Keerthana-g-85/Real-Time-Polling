@@ -11,6 +11,9 @@ export default async function useApi({ query, input, variables }: Value) {
     "http://localhost:3060/graphql",
     query,
     variables ?? { input },
+    {
+      credentials: "include",
+    },
   );
   return response;
 }
