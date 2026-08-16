@@ -24,7 +24,7 @@ export default function CreatePoll() {
   });
   const [options, setOptions] = useState(["", ""]);
   const [allowedusers, setAllowedUsers] = useState<string[]>([]);
-  const id = useSelector((state: any) => state.login.user.id);
+  const user = useSelector((state:  { login: { user: Users | null } }) => state.login.user);
   async function handleCreatePoll() {
     const response = await useApi({
       query: CREATE_POLL,
@@ -34,7 +34,7 @@ export default function CreatePoll() {
         expire_time: poll.expireTime,
         options: options,
         allowed_users : allowedusers,
-        user_id: id,
+        user_id: user?.id,
       },
     });
     console.log(response);

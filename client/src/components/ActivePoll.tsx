@@ -16,7 +16,7 @@ import { BarChart } from "@mui/x-charts";
 export default function ActivePoll() {
   const [option, setOption] = useState("");
   const queryClient = useQueryClient();
-  const id = useSelector((state: any) => state.login.user.id);
+  const id = useSelector((state: any) => state?.login?.user?.id);
 
   async function getActivePolls() {
     const response = await useApi({
