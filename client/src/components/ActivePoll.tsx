@@ -10,8 +10,8 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { CREATE_VOTE } from "../graphql/Mutation/CREATE_VOTE";
 import { GET_VOTED_POLLS } from "../graphql/Query/GET_VOTED_POLLS";
-import { LineChart } from "@mui/x-charts/LineChart";
 import Grid from "@mui/material/Grid";
+import { BarChart } from "@mui/x-charts";
 
 export default function ActivePoll() {
   const [option, setOption] = useState("");
@@ -49,9 +49,12 @@ export default function ActivePoll() {
       const data = JSON.parse(event.data);
 
       if (data.type === "POLL_UPDATED") {
-        refetch();
+         refetch()
         console.log("Poll updated:", data.pollId);
         console.log("Results:", data.results);
+        // queryClient.invalidateQueries({
+        //   queryKey: ["votedPolls", id],
+        // });
       }
     };
     return () => {
@@ -142,10 +145,10 @@ export default function ActivePoll() {
                   ),
                 )}
                 <Grid size={8}>
-                  <LineChart
+                  <BarChart
                     xAxis={[
                       {
-                        scaleType: "point",
+                        scaleType: "band",
                         data: data.option_id.map(
                           (option: Options) => option.option,
                         ),

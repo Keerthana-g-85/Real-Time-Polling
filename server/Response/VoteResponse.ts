@@ -9,6 +9,6 @@ export default class VoteResponse {
   @Field(() => String)
   message!: string;
 
-  @Field(() => GraphQLJSON)
-  results!: Record<string, Record<string, number>>;
+  @Field(() => GraphQLJSON , {nullable: true})
+  results?: Record<string, Record<string, number>>;
 }
