@@ -6,6 +6,7 @@ import CreatePoll from "./components/CreatePoll";
 import ActivePoll from "./components/ActivePoll";
 import ProtectedRouter from "./Routes/ProtectedRoute";
 import PublicRoute from "./Routes/PublicRoute";
+import CompletedPoll from "./components/CompletedPoll";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
               <Route path="/home" element={<Home />} />
               <Route path="/create_poll" element={<CreatePoll />} />
               <Route path="/active_poll" element={<ActivePoll />} />
+              <Route path="/completed_poll" element={<CompletedPoll/>} />
             </Route>
           </Route>
         </Routes>

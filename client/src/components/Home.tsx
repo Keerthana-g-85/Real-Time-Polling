@@ -35,6 +35,12 @@ export default function Home() {
       icon: <HomeIcon />,
       path: "/active_poll",
     },
+    {
+      text: "Completed Poll",
+      icon: <HomeIcon />,
+      path: "/completed_poll",
+    },
+    
     { text: "Logout", icon: <HomeIcon />, path: "" },
   ];
   function handleLogout() {

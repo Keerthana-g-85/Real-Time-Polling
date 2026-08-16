@@ -15,7 +15,6 @@ export default class PollService {
     question,
     options,
     expire_time,
-    status,
     user_id,
     allowed_users,
   }: CreatePollArguments) {
@@ -41,7 +40,7 @@ export default class PollService {
           question,
           user_id: user,
           expire_time,
-          status,
+          status: "Active",
         });
 
         const poll = await pollRepo.save(createPoll);
@@ -93,14 +92,24 @@ export default class PollService {
           },
         },
       });
-      if (status === "Active") {
-        polls = poll.filter((i) => i.expire_time > new Date());
-        // console.log(polls);
-      } else if (status === "Completed") {
-        polls = poll.filter((i) => i.expire_time < new Date());
-        // console.log(polls);
-      } else {
-        polls = poll;
+      for (let i of poll) {
+        if (i.expire_time <= new Date() && i.status === "Active") {
+          i.status = "Completed";
+          await this.pollRepo.save(i);
+        }
+      }
+      switch (status) {
+        case "Active":
+          polls = poll.filter((i) => i.expire_time > new Date());
+          break;
+
+        case "Completed":
+          polls = poll.filter((i) => i.expire_time <= new Date());
+          break;
+
+        default:
+          polls = poll;
+          break;
       }
 
       if (user_id) {

@@ -34,7 +34,6 @@ export default function CreatePoll() {
         expire_time: poll.expireTime,
         options: options,
         allowed_users : allowedusers,
-        status: "Active",
         user_id: id,
       },
     });

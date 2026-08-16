@@ -49,7 +49,7 @@ export default function ActivePoll() {
       const data = JSON.parse(event.data);
 
       if (data.type === "POLL_UPDATED") {
-         refetch()
+        refetch();
         console.log("Poll updated:", data.pollId);
         console.log("Results:", data.results);
         // queryClient.invalidateQueries({
@@ -113,37 +113,31 @@ export default function ActivePoll() {
           <Card sx={{ mt: 2, p: 4 }}>
             <Typography>Name : {data.poll_name}</Typography>
             <Typography>Question :{data.question}</Typography>
-
-            <RadioGroup
-              value={option}
-              onChange={(e) => setOption(e.target.value)}
-            >
-              {data?.option_id?.map((i: Options) => (
-                <FormControlLabel
-                  key={i.id}
-                  value={i.id}
-                  control={<Radio />}
-                  label={i.option}
-                />
-              ))}
-            </RadioGroup>
-
             {!votedPolls?.[data.id] ? (
-              <Button
-                variant="contained"
-                onClick={() => voteMutation.mutate(data.id)}
-              >
-                Submit
-              </Button>
+              <>
+                <RadioGroup
+                  value={option}
+                  onChange={(e) => setOption(e.target.value)}
+                >
+                  {data?.option_id?.map((i: Options) => (
+                    <FormControlLabel
+                      key={i.id}
+                      value={i.id}
+                      control={<Radio />}
+                      label={i.option}
+                    />
+                  ))}
+                </RadioGroup>
+                <Button
+                  variant="contained"
+                  onClick={() => voteMutation.mutate(data.id)}
+                >
+                  Submit
+                </Button>
+              </>
             ) : (
               <>
-                {Object.entries(votedPolls[data.id] as VoteCount).map(
-                  ([option, count]) => (
-                    <Typography key={option}>
-                      {option}: {count} votes
-                    </Typography>
-                  ),
-                )}
+                
                 <Grid size={8}>
                   <BarChart
                     xAxis={[

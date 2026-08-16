@@ -21,4 +21,10 @@ export default class VoteResolver {
     return voteService.getVoteUserPoll(args);
   }
 
+  @Query(() => VoteResponse)
+  getCompletedPollResults(
+    @Args(() => GetVoteUsersPollArguments) args: GetVoteUsersPollArguments,
+  ) {
+    return voteService.getCompletedPollResults(args);
+  }
 }

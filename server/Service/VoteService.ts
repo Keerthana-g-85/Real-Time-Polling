@@ -153,4 +153,55 @@ export default class VoteService {
       throw new GraphQLError("Error while getting voted polls");
     }
   }
+
+  async getCompletedPollResults({ user_id }: GetVoteUsersPollArguments) {
+    try {
+      const polls = await this.pollRepo.find({
+        where: {
+          status: "Completed",
+          allowed_users: {
+            user_id: {
+              id: user_id,
+            },
+          },
+        },
+        relations: {
+          user_id: true,
+          option_id: {
+            votes: true,
+          },
+          allowed_users: {
+            user_id: true,
+          },
+        },
+      });
+
+      const completedPolls = polls.map((poll) => {
+        const results: Record<string, number> = {};
+
+        poll.option_id.forEach((option) => {
+          results[option.option] = option.votes.length;
+        });
+
+        return {
+          poll,
+          results,
+        };
+      });
+
+      return {
+        success: true,
+        message: "Completed poll results",
+        completedPolls,
+      };
+    } catch (error) {
+      console.error(error);
+
+      if (error instanceof GraphQLError) {
+        throw error;
+      }
+
+      throw new GraphQLError("Error while getting completed poll results");
+    }
+  }
 }
