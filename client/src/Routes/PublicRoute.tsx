@@ -6,7 +6,7 @@ export default function PublicRoute() {
   const user = useSelector((state:  { login: { user: Users | null } }) => state.login.user);
 
   if (user?.id) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/home" replace />;
   }
   return <Outlet />;
 }

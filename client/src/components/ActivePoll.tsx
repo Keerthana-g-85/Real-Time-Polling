@@ -21,7 +21,7 @@ export default function ActivePoll() {
   async function getActivePolls() {
     const response = await useApi({
       query: GET_ACTIVE_POOLS,
-      variables: { status: "Active", userId: id },
+      variables: { status: "Active" },
     });
     console.log(response.getPoll.polls);
     return response.getPoll.polls;
@@ -65,9 +65,6 @@ export default function ActivePoll() {
   async function getVotedPolls() {
     const response = await useApi({
       query: GET_VOTED_POLLS,
-      variables: {
-        userId: id,
-      },
     });
     console.log(response.getVoteUserPoll);
     return response.getVoteUserPoll.results;
@@ -87,7 +84,6 @@ export default function ActivePoll() {
       query: CREATE_VOTE,
       variables: {
         input: {
-          user_id: id,
           poll_id: poll_id,
           option_id: option,
         },

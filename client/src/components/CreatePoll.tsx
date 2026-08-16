@@ -12,7 +12,6 @@ import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import useApi from "../Api";
 import { CREATE_POLL } from "../graphql/Mutation/CREATE_POLL";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
 import { GET_USERS } from "../graphql/Query/GET_USERS";
 import type { Users } from "../Types";
 
@@ -24,7 +23,7 @@ export default function CreatePoll() {
   });
   const [options, setOptions] = useState(["", ""]);
   const [allowedusers, setAllowedUsers] = useState<string[]>([]);
-  const user = useSelector((state:  { login: { user: Users | null } }) => state.login.user);
+
   async function handleCreatePoll() {
     const response = await useApi({
       query: CREATE_POLL,
@@ -34,7 +33,6 @@ export default function CreatePoll() {
         expire_time: poll.expireTime,
         options: options,
         allowed_users : allowedusers,
-        user_id: user?.id,
       },
     });
     console.log(response);

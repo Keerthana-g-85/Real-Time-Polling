@@ -14,9 +14,6 @@ export default class CreatePollArguments {
   @Field(() => GraphQLISODateTime)
   expire_time!: Date;
 
-  @Field(()=>ID)
-  user_id! : string
-
   @Field(() => [String])
   allowed_users! : string[]
 }

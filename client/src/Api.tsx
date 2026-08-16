@@ -1,4 +1,11 @@
-import { request } from "graphql-request";
+import { GraphQLClient } from "graphql-request";
+
+const client = new GraphQLClient(
+  "http://localhost:3060/graphql",
+  {
+    credentials: "include",
+  },
+);
 
 interface Value {
   query: string;
@@ -6,14 +13,13 @@ interface Value {
   variables?: Record<string, unknown>;
 }
 
-export default async function useApi({ query, input, variables }: Value) {
-  const response = await request(
-    "http://localhost:3060/graphql",
+export default async function useApi({
+  query,
+  input,
+  variables,
+}: Value) {
+  return client.request(
     query,
     variables ?? { input },
-    {
-      credentials: "include",
-    },
   );
-  return response;
 }

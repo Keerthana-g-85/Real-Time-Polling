@@ -1,8 +1,8 @@
 import { gql } from "graphql-request";
 
 export const GET_COMPLETED_POLL_RESULTS = gql`
-  query GetCompletedPollResults($userId: ID!) {
-    getCompletedPollResults(user_id: $userId) {
+  query GetCompletedPollResults {
+    getCompletedPollResults {
       success
       message
       completedPolls {

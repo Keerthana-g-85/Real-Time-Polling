@@ -1,8 +1,8 @@
 import { gql } from "graphql-request";
 
 export const GET_ACTIVE_POOLS = gql`
-  query GetPoll($status: String, $userId: ID) {
-    getPoll(status: $status, user_id: $userId) {
+  query GetPoll($status: String) {
+    getPoll(status: $status) {
       success
       message
       polls {

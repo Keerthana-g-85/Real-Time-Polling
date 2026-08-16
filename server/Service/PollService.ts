@@ -15,9 +15,8 @@ export default class PollService {
     question,
     options,
     expire_time,
-    user_id,
     allowed_users,
-  }: CreatePollArguments) {
+  }: CreatePollArguments , user_id: string) {
     try {
       return await database.transaction(async (manager) => {
         const usersRepo = manager.getRepository(Users);
@@ -77,7 +76,7 @@ export default class PollService {
     }
   }
 
-  async getPoll({ status, user_id }: GetPollArguments) {
+  async getPoll({ status}: GetPollArguments , user_id:string) {
     try {
       let polls;
       // console.log(new Date());

@@ -18,9 +18,6 @@ export default function CompletedPoll() {
   async function getCompletedPollResults() {
     const response = await useApi({
       query: GET_COMPLETED_POLL_RESULTS,
-      variables: {
-        userId: id,
-      },
     });
 
     return response.getCompletedPollResults.completedPolls;

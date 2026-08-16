@@ -4,6 +4,9 @@ import useApi from "../Api";
 import { LOGIN_USER } from "../graphql/Mutation/LOGIN_USER";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import { ME } from "../graphql/Query/Me";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/LoginSlice";
 
 export default function Login() {
   const [login, setLogin] = useState({ email: "", password: "" });
@@ -16,6 +19,7 @@ export default function Login() {
     password: "",
   });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   function handleLogin() {
     try {
       if (!login.email) {
@@ -48,14 +52,16 @@ export default function Login() {
         password: login.password,
       },
     });
-    console.log(response.loginUser);
-    localStorage.setItem("token", response.loginUser.accesstoken);
-    return response.loginUser;
+    console.log(response);
+    const meResponse = await useApi({ query: ME });
+    console.log(meResponse)
+    return meResponse.me;
   }
 
   const userLoginMutation = useMutation({
     mutationFn: userLogin,
-    onSuccess: () => {
+    onSuccess: (me) => {
+      dispatch(setUser(me));
       navigate("/home");
     },
   });

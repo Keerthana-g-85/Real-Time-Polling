@@ -7,14 +7,13 @@ import Users from "../models/UsersModel.js";
 import Vote from "../models/VoteModel.js";
 import { notifyPollUpdated } from "./WebSocketService.js";
 import type { Result } from "./WebSocketService.js";
-import type GetVoteUsersPollArguments from "../arguments/vote/GetVoteUserArguments.js";
 
 export default class VoteService {
   private usersRepo = database.getRepository(Users);
   private pollRepo = database.getRepository(Poll);
   private optionRepo = database.getRepository(Options);
   private voteRepo = database.getRepository(Vote);
-  async createVote({ user_id, poll_id, option_id }: CreateVoteArguments) {
+  async createVote({ poll_id, option_id }: CreateVoteArguments , user_id : string) {
     try {
       const user = await this.usersRepo.findOneBy({ id: user_id });
       if (!user) {
@@ -95,7 +94,7 @@ export default class VoteService {
     }
   }
 
-  async getVoteUserPoll({ user_id }: GetVoteUsersPollArguments) {
+  async getVoteUserPoll( user_id : string) {
     try {
       const userPoll = await this.voteRepo.find({
         where: {
@@ -154,7 +153,7 @@ export default class VoteService {
     }
   }
 
-  async getCompletedPollResults({ user_id }: GetVoteUsersPollArguments) {
+  async getCompletedPollResults( user_id : string) {
     try {
       const polls = await this.pollRepo.find({
         where: {

@@ -12,7 +12,7 @@ import ListItemText from "@mui/material/ListItemText";
 import { Outlet, useNavigate } from "react-router";
 import HomeIcon from "@mui/icons-material/Home";
 import { useDispatch } from "react-redux";
-import { addToken } from "../redux/LoginSlice";
+
 
 const drawerWidth = 240;
 
@@ -45,7 +45,7 @@ export default function Home() {
   ];
   function handleLogout() {
     localStorage.removeItem("token");
-    dispatch(addToken(""));
+  
     navigate("/", { replace: true });
   }
   return (

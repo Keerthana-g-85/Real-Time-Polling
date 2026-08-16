@@ -1,23 +1,23 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { jwtDecode } from "jwt-decode";
-const token = localStorage.getItem("token");
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { Users } from "../Types";
 
-const initialState = {
-  token: token,
-  user: token ? jwtDecode(token) : null,
+interface LoginState {
+  user: Users | null;
+}
+
+const initialState: LoginState = {
+  user: null,
 };
 
 const loginSlice = createSlice({
   name: "login",
   initialState,
   reducers: {
-    addToken: (state, action) => {
-      state.token = action.payload;
-
-      state.user = action.payload ? jwtDecode(action.payload) : null;
+    setUser: (state, action) => {
+      state.user = action.payload;
     },
   },
 });
 
-export const { addToken } = loginSlice.actions;
+export const { setUser } = loginSlice.actions;
 export default loginSlice.reducer;

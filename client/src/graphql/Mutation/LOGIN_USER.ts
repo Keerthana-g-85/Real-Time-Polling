@@ -5,7 +5,6 @@ export const LOGIN_USER = gql`
     loginUser(input: $input) {
       success
       message
-      accesstoken
     }
   }
 `;
