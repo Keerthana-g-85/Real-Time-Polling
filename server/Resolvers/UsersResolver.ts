@@ -40,4 +40,10 @@ export default class UsersResolver {
     }
     return userService.getUsers();
   }
+
+  @Mutation(() => LoginResponse)
+  logout(@Ctx() ctx: AuthContext) {
+    ctx.res.clearCookie("token");
+    return { success: true, message: "Logged out" };
+  }
 }

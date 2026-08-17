@@ -12,7 +12,9 @@ import ListItemText from "@mui/material/ListItemText";
 import { Outlet, useNavigate } from "react-router";
 import HomeIcon from "@mui/icons-material/Home";
 import { useDispatch } from "react-redux";
-
+import useApi from "../Api";
+import { LOGOUT } from "../graphql/Mutation/LOG_OUT";
+import { setUser } from "../redux/LoginSlice";
 
 const drawerWidth = 240;
 
@@ -40,13 +42,16 @@ export default function Home() {
       icon: <HomeIcon />,
       path: "/completed_poll",
     },
-    
+
     { text: "Logout", icon: <HomeIcon />, path: "" },
   ];
-  function handleLogout() {
-    localStorage.removeItem("token");
-  
-    navigate("/", { replace: true });
+  async function handleLogout() {
+    try {
+      await useApi({ query: LOGOUT });
+    } finally {
+      dispatch(setUser(null));
+      navigate("/", { replace: true });
+    }
   }
   return (
     <>

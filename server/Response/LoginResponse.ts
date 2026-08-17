@@ -7,7 +7,4 @@ export default class LoginResponse {
 
   @Field(() => String)
   message!: string;
-
-  @Field(() => String, { nullable: true })
-  accesstoken?: string;
 }
