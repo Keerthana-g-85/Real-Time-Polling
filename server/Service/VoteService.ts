@@ -7,13 +7,17 @@ import Users from "../models/UsersModel.js";
 import Vote from "../models/VoteModel.js";
 import { notifyPollUpdated } from "./WebSocketService.js";
 import type { Result } from "./WebSocketService.js";
+import type GetCompletedPollResults from "../arguments/vote/GetCompletedPollResults.js";
 
 export default class VoteService {
   private usersRepo = database.getRepository(Users);
   private pollRepo = database.getRepository(Poll);
   private optionRepo = database.getRepository(Options);
   private voteRepo = database.getRepository(Vote);
-  async createVote({ poll_id, option_id }: CreateVoteArguments , user_id : string) {
+  async createVote(
+    { poll_id, option_id }: CreateVoteArguments,
+    user_id: string,
+  ) {
     try {
       const user = await this.usersRepo.findOneBy({ id: user_id });
       if (!user) {
@@ -94,7 +98,7 @@ export default class VoteService {
     }
   }
 
-  async getVoteUserPoll( user_id : string) {
+  async getVoteUserPoll(user_id: string) {
     try {
       const userPoll = await this.voteRepo.find({
         where: {
@@ -153,7 +157,10 @@ export default class VoteService {
     }
   }
 
-  async getCompletedPollResults( user_id : string) {
+  async getCompletedPollResults(
+    { start, end }: GetCompletedPollResults,
+    user_id: string,
+  ) {
     try {
       const polls = await this.pollRepo.find({
         where: {
@@ -173,15 +180,28 @@ export default class VoteService {
             user_id: true,
           },
         },
+        skip: start as number,
+        take: end as number,
       });
 
+      const total = await this.pollRepo.count({
+        where: {
+          status: "Completed",
+          allowed_users: {
+            user_id: {
+              id: user_id,
+            },
+          },
+        },
+      });
+
+      const total_pages = Math.ceil((total as number) / (end as number));
       const completedPolls = polls.map((poll) => {
         const results: Record<string, number> = {};
 
         poll.option_id.forEach((option) => {
           results[option.option] = option.votes.length;
         });
-
         return {
           poll,
           results,
@@ -192,6 +212,7 @@ export default class VoteService {
         success: true,
         message: "Completed poll results",
         completedPolls,
+        total_pages,
       };
     } catch (error) {
       console.error(error);

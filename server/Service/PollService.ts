@@ -6,17 +6,20 @@ import Users from "../models/UsersModel.js";
 import Options from "../models/OptionsModel.js";
 import type GetPollArguments from "../arguments/poll/GetPoll.js";
 import AllowedUser from "../models/AllowedUsersModel.js";
-import { In } from "typeorm";
+import { In, MoreThan } from "typeorm";
 
 export default class PollService {
   private pollRepo = database.getRepository(Poll);
-  async createPoll({
-    poll_name,
-    question,
-    options,
-    expire_time,
-    allowed_users,
-  }: CreatePollArguments , user_id: string) {
+  async createPoll(
+    {
+      poll_name,
+      question,
+      options,
+      expire_time,
+      allowed_users,
+    }: CreatePollArguments,
+    user_id: string,
+  ) {
     try {
       return await database.transaction(async (manager) => {
         const usersRepo = manager.getRepository(Users);
@@ -76,11 +79,13 @@ export default class PollService {
     }
   }
 
-  async getPoll({ status}: GetPollArguments , user_id:string) {
+  async getPoll({ start, end }: GetPollArguments) {
     try {
-      let polls;
-      // console.log(new Date());
-      const poll = await this.pollRepo.find({
+      const polls = await this.pollRepo.find({
+        where: {
+          status: "Active",
+          expire_time: MoreThan(new Date()),
+        },
         relations: {
           user_id: true,
           option_id: {
@@ -90,47 +95,33 @@ export default class PollService {
             user_id: true,
           },
         },
+        skip: start as number,
+        take: end as number,
       });
-      for (let i of poll) {
-        if (i.expire_time <= new Date() && i.status === "Active") {
-          i.status = "Completed";
-          await this.pollRepo.save(i);
-        }
-      }
-      switch (status) {
-        case "Active":
-          polls = poll.filter((i) => i.expire_time > new Date());
-          break;
 
-        case "Completed":
-          polls = poll.filter((i) => i.expire_time <= new Date());
-          break;
+      const total = await this.pollRepo.count({
+        where: {
+          status: "Active",
+          expire_time: MoreThan(new Date()),
+        },
+      });
 
-        default:
-          polls = poll;
-          break;
-      }
+      const total_pages = Math.ceil(total / (end as number));
 
-      if (user_id) {
-        polls = polls.filter(
-          (poll) =>
-            poll.user_id.id === user_id ||
-            poll.allowed_users.some(
-              (allowedUser) => allowedUser.user_id.id === user_id,
-            ),
-        );
-      }
       return {
         success: true,
         message: "All polls",
         polls,
+        total_pages,
       };
     } catch (error) {
       console.log(error);
+
       if (error instanceof GraphQLError) {
         throw error;
       }
-      throw new GraphQLError("Error while getting Users");
+
+      throw new GraphQLError("Error while getting polls");
     }
   }
 }

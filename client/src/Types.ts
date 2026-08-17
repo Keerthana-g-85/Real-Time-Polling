@@ -22,3 +22,8 @@ export interface VoteCount {
 export interface Result {
   [pollId: string]: VoteCount;
 }
+
+export interface CompletedPollData {
+  poll: Poll;
+  results: Record<string, number>;
+};

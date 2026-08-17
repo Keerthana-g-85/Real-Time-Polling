@@ -4,6 +4,7 @@ import VoteService from "../Service/VoteService.js";
 import CreateVoteArguments from "../arguments/vote/CreateVoteArguments.js";
 import VoteResponse from "../Response/VoteResponse.js";
 import type { AuthContext } from "../types.js";
+import GetCompletedPollResults from "../arguments/vote/GetCompletedPollResults.js";
 
 const voteService = new VoteService();
 @Resolver()
@@ -28,10 +29,10 @@ export default class VoteResolver {
   }
 
   @Query(() => VoteResponse)
-  getCompletedPollResults(@Ctx() ctx: AuthContext) {
+  getCompletedPollResults(@Args(()=>GetCompletedPollResults)args:GetCompletedPollResults, @Ctx() ctx: AuthContext) {
     if (!ctx.user) {
       throw new GraphQLError("No authentication");
     }
-    return voteService.getCompletedPollResults(ctx.user.id);
+    return voteService.getCompletedPollResults(args ,ctx.user.id);
   }
 }

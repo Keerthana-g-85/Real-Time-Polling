@@ -64,7 +64,7 @@ export default function Home() {
       <Box
         sx={{
           display: "flex",
-          bgcolor: "#325E6A",
+          // bgcolor: "#325E6A",
           width: "100vw",
           minHeight: "100vh",
         }}

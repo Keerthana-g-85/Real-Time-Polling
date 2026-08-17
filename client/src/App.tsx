@@ -22,7 +22,6 @@ export default function App() {
         const response = await useApi({
           query: ME,
         });
-
         dispatch(setUser(response.me));
       } catch (error) {
         console.log("User not authenticated");

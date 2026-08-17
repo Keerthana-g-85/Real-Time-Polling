@@ -1,76 +1,83 @@
 import { useQuery } from "@tanstack/react-query";
 import useApi from "../Api";
 import { Box, Card, Typography } from "@mui/material";
-import type { Poll } from "../Types";
+import type { CompletedPollData } from "../Types";
 import { useSelector } from "react-redux";
 import Grid from "@mui/material/Grid";
 import { BarChart } from "@mui/x-charts";
 import { GET_COMPLETED_POLL_RESULTS } from "../graphql/Query/GET_COMPLETED_POLLS";
 import PollIcon from "@mui/icons-material/Poll";
-
-type CompletedPollData = {
-  poll: Poll;
-  results: Record<string, number>;
-};
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
+import { useState } from "react";
 
 export default function CompletedPoll() {
+  const [page, setPage] = useState(1);
+  const end = 2;
+  const start = (page - 1) * end;
+
   const id = useSelector((state: any) => state.login.user.id);
 
   async function getCompletedPollResults() {
     const response = await useApi({
       query: GET_COMPLETED_POLL_RESULTS,
+      variables: {
+        start,
+        end,
+      },
     });
-
-    return response.getCompletedPollResults.completedPolls;
+    console.log(response.getCompletedPollResults);
+    return response.getCompletedPollResults;
   }
 
-  const { data: completedPolls } = useQuery<CompletedPollData[]>({
-    queryKey: ["completedPolls", id],
+  const { data } = useQuery({
+    queryKey: ["completedPolls", id , page],
     queryFn: getCompletedPollResults,
   });
+  const completedPolls = data?.completedPolls;
 
   return (
     <>
-      {completedPolls?.map((data) => {
-        const poll = data.poll;
-        const results = data.results;
-        return (
-          <Box key={poll.id} sx={{ bgcolor: "#AACDDC" }}>
-            <Card sx={{ mt: 2, p: 4, bgcolor: "#FCF8F8" }}>
-              <Box
-                sx={{
-                  bgcolor: "#56B6C6",
-                  color: "white",
-                  padding: 2,
-                  borderRadius: 3,
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Typography
+      <Grid container spacing={2}>
+        {completedPolls?.map((data: CompletedPollData) => {
+          const poll = data.poll;
+          const results = data.results;
+          return (
+            <Box key={poll.id}>
+              <Card sx={{ mt: 2, p: 4, bgcolor: "#FCF8F8" }}>
+                <Box
                   sx={{
-                    fontFamily: "ui-monospace",
-                    fontWeight: 700,
-                    fontSize: 30,
+                    bgcolor: "#56B6C6",
+                    color: "white",
+                    padding: 2,
+                    borderRadius: 3,
+                    display: "flex",
+                    alignItems: "center",
                   }}
                 >
-                  {poll.poll_name}
-                </Typography>
-                <PollIcon sx={{ fontSize: 36 }} />
-              </Box>
+                  <Typography
+                    sx={{
+                      fontFamily: "ui-monospace",
+                      fontWeight: 700,
+                      fontSize: 30,
+                    }}
+                  >
+                    {poll.poll_name}
+                  </Typography>
+                  <PollIcon sx={{ fontSize: 36 }} />
+                </Box>
 
-              <Box sx={{ p: 3, bgcolor: "#FBEFEF", borderRadius: 2, mt: 2 }}>
-                <Typography
-                  sx={{
-                    fontFamily: "ui-monospace",
-                    fontSize: 25,
-                    color: "#3E5F44",
-                  }}
-                >
-                  {poll.question}
-                </Typography>
+                <Box sx={{ p: 3, bgcolor: "#FBEFEF", borderRadius: 2, mt: 2 }}>
+                  <Typography
+                    sx={{
+                      fontFamily: "ui-monospace",
+                      fontSize: 25,
+                      color: "#3E5F44",
+                    }}
+                  >
+                    {poll.question}
+                  </Typography>
 
-                <Grid size={8}>
                   <BarChart
                     xAxis={[
                       {
@@ -90,12 +97,21 @@ export default function CompletedPoll() {
                     height={500}
                     width={600}
                   />
-                </Grid>
-              </Box>
-            </Card>
-          </Box>
-        );
-      })}
+                </Box>
+              </Card>
+            </Box>
+          );
+        })}
+      </Grid>
+      <Stack sx={{ display: "flex", alignItems: "center", mt: 3 }}>
+        <Pagination
+          page={page}
+          count={data?.total_pages ?? 1}
+          onChange={(_, value) => setPage(value)}
+          variant="outlined"
+          shape="rounded"
+        />
+      </Stack>
     </>
   );
 }

@@ -13,24 +13,31 @@ import { GET_VOTED_POLLS } from "../graphql/Query/GET_VOTED_POLLS";
 import Grid from "@mui/material/Grid";
 import { BarChart } from "@mui/x-charts";
 import PollIcon from "@mui/icons-material/Poll";
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
 
 export default function ActivePoll() {
   const [option, setOption] = useState("");
+  const [page, setPage] = useState(1);
+  const end = 2;
+  const start = (page - 1) * end;
   const queryClient = useQueryClient();
   const id = useSelector((state: any) => state?.login?.user?.id);
 
   async function getActivePolls() {
     const response = await useApi({
       query: GET_ACTIVE_POOLS,
-      variables: { status: "Active" },
+      variables: { status: "Active", start, end },
     });
     console.log(response.getPoll.polls);
-    return response.getPoll.polls;
+    return response.getPoll;
   }
-  const { data: activePoll, refetch } = useQuery({
-    queryKey: ["active"],
+  const { data, refetch } = useQuery({
+    queryKey: ["active", page],
     queryFn: getActivePolls,
   });
+
+  const activePoll = data?.polls;
 
   useEffect(() => {
     if (!activePoll) return;
@@ -105,65 +112,83 @@ export default function ActivePoll() {
 
   return (
     <>
-      {activePoll?.map((data: Poll) => (
-        <Box key={data.id} sx={{ bgcolor: "#AACDDC" }}>
-          <Card sx={{ mt: 2, p: 4, bgcolor: "#FCF8F8" }}>
-            <Box
+      <Grid container spacing={2}>
+        {activePoll?.map((data: Poll) => (
+          <Grid size={{ xs: 12, md: 6 }} key={data.id}>
+            <Card
               sx={{
-                bgcolor: "#56B6C6",
-                color: "white",
-                padding: 2,
-                borderRadius: 3,
-                display: "flex",
-                alignItems: "center",
+                mt: 2,
+                p: 4,
+                bgcolor: "#FCF8F8",
+                width: "100%",
+                height: "100%",
               }}
             >
-              <Typography
+              <Box
                 sx={{
-                  fontFamily: "ui-monospace",
-                  fontWeight: 700,
-                  fontSize: 30,
+                  bgcolor: "#56B6C6",
+                  color: "white",
+                  padding: 2,
+                  borderRadius: 3,
+                  display: "flex",
+                  alignItems: "center",
                 }}
               >
-                {data.poll_name}
-              </Typography>
-              <PollIcon sx={{ fontSize: 36 }} />
-            </Box>
-            <Box sx={{ p: 3, bgcolor: "#FBEFEF", borderRadius: 2, mt: 2 }}>
-              <Typography
+                <Typography
+                  sx={{
+                    fontFamily: "ui-monospace",
+                    fontWeight: 700,
+                    fontSize: 30,
+                  }}
+                >
+                  {data.poll_name}
+                </Typography>
+                <PollIcon sx={{ fontSize: 36 }} />
+              </Box>
+              <Box
                 sx={{
-                  fontFamily: "ui-monospace",
-                  fontSize: 25,
-                  color: "#3E5F44",
+                  p: 3,
+                  bgcolor: "#FBEFEF",
+                  borderRadius: 2,
+                  mt: 2,
+                  width: "100%",
                 }}
               >
-                {data.question}
-              </Typography>
-              {!votedPolls?.[data.id] ? (
-                <>
-                  <RadioGroup
-                    value={option}
-                    onChange={(e) => setOption(e.target.value)}
-                  >
-                    {data?.option_id?.map((i: Options) => (
-                      <FormControlLabel
-                        key={i.id}
-                        value={i.id}
-                        control={<Radio />}
-                        label={i.option}
-                      />
-                    ))}
-                  </RadioGroup>
-                  <Button
-                    variant="contained"
-                    onClick={() => voteMutation.mutate(data.id)}
-                  >
-                    Submit
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Grid size={8}>
+                <Typography
+                  sx={{
+                    fontFamily: "ui-monospace",
+                    fontSize: 25,
+                    color: "#3E5F44",
+                  }}
+                >
+                  {data.question}
+                </Typography>
+                {!votedPolls?.[data.id] ? (
+                  <>
+                    <RadioGroup
+                      value={option}
+                      onChange={(e) => setOption(e.target.value)}
+                      sx={{ p: 4 }}
+                    >
+                      {data?.option_id?.map((i: Options) => (
+                        <FormControlLabel
+                          sx={{ mb: 2 }}
+                          key={i.id}
+                          value={i.id}
+                          control={<Radio />}
+                          label={i.option}
+                        />
+                      ))}
+                    </RadioGroup>
+                    <Button
+                      variant="contained"
+                      onClick={() => voteMutation.mutate(data.id)}
+                    >
+                      Submit
+                    </Button>
+                  </>
+                ) : (
+                  <>
                     <BarChart
                       xAxis={[
                         {
@@ -194,13 +219,22 @@ export default function ActivePoll() {
                       height={500}
                       width={600}
                     />
-                  </Grid>
-                </>
-              )}
-            </Box>
-          </Card>
-        </Box>
-      ))}
+                  </>
+                )}
+              </Box>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+      <Stack sx={{ display: "flex", alignItems: "center", mt: 3 }}>
+        <Pagination
+          page={page}
+          count={data?.total_pages ?? 1}
+          onChange={(_, value) => setPage(value)}
+          variant="outlined"
+          shape="rounded"
+        />
+      </Stack>
     </>
   );
 }

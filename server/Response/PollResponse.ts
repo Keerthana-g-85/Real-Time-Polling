@@ -1,4 +1,4 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 import Poll from "../models/PollModel.js";
 
 @ObjectType()
@@ -11,4 +11,7 @@ export default class PollResponse {
 
   @Field(() => [Poll], { nullable: true })
   polls!: Poll[];
+
+  @Field(() => Int)
+  total_pages?: number;
 }

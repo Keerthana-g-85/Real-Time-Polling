@@ -24,4 +24,7 @@ export default class VoteResponse {
 
   @Field(() => [CompletedPollResult], { nullable: true })
   completedPolls?: CompletedPollResult[];
+
+  @Field(()=>Int)
+  total_pages? : number
 }
