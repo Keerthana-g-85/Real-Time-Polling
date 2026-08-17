@@ -54,16 +54,15 @@ app.use(
   expressMiddleware(server, {
     context: async ({ req, res }): Promise<AuthContext> => {
       let user: AuthUser | null = null;
-      const token = req.cookies?.token;
+      const accesstoken = req.cookies?.accessToken;
 
-      if (token) {
+      if (accesstoken) {
         try {
-          user = jwt.verify(token, process.env.JW_SECRET as string) as AuthUser;
+          user = jwt.verify(accesstoken, process.env.JW_SECRET as string) as AuthUser;
         } catch {
           user = null;
         }
       }
-
       return { user, req, res };
     },
   }),

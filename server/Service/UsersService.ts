@@ -5,7 +5,8 @@ import { GraphQLError } from "graphql";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import type LoginUser from "../arguments/users/LoginUserArguments.js";
-import type { Response } from "express";
+import type { Request, Response } from "express";
+import type { AuthUser } from "../types.js";
 
 export default class UsersService {
   private usersRepo = database.getRepository(Users);
@@ -49,18 +50,31 @@ export default class UsersService {
       const accesstoken = jwt.sign(
         { id: user.id, name: user.name, email: user.email },
         process.env.JW_SECRET as string,
-        { expiresIn: "2hr" },
+        { expiresIn: "30s" },
       );
-      res.cookie("token", accesstoken, {
+
+      const refreshtoken = jwt.sign(
+        { id: user.id, name: user.name, email: user.email },
+        process.env.REFRESH_SECRET as string,
+        { expiresIn: "7d" },
+      );
+      res.cookie("accessToken", accesstoken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 2 * 60 * 60 * 1000,
+        maxAge: 30 * 1000,
       });
+
+      res.cookie("refreshToken", refreshtoken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
       return {
         success: true,
         message: "User successfully logged in",
-        accesstoken,
       };
     } catch (error) {
       console.log(error);
@@ -85,6 +99,39 @@ export default class UsersService {
         throw error;
       }
       throw new GraphQLError("Error while getting Users");
+    }
+  }
+  async refreshAccessToken(req: Request, res: Response) {
+    try {
+      const refreshToken = req.cookies?.refreshToken;
+      if (!refreshToken) {
+        throw new GraphQLError("No refresh token");
+      }
+      const user = jwt.verify(
+        refreshToken,
+        process.env.REFRESH_SECRET as string,
+      ) as AuthUser;
+      const newAccessToken = jwt.sign(
+        { id: user.id, name: user.name, email: user.email },
+        process.env.JW_SECRET as string,
+        { expiresIn: "2hr" },
+      );
+      res.cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 2 * 60 * 60 * 1000,
+      });
+
+      return {
+        success: true,
+        message: "Access token refreshed",
+      };
+    } catch (error) {
+      if (error instanceof GraphQLError) {
+        throw error;
+      }
+      throw new GraphQLError("Error while getting refresh token ");
     }
   }
 }
