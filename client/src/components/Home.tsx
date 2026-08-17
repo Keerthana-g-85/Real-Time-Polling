@@ -15,7 +15,10 @@ import { useDispatch } from "react-redux";
 import useApi from "../Api";
 import { LOGOUT } from "../graphql/Mutation/LOG_OUT";
 import { setUser } from "../redux/LoginSlice";
-
+import PollIcon from "@mui/icons-material/Poll";
+import HowToVoteIcon from "@mui/icons-material/HowToVote";
+import AddIcon from "@mui/icons-material/Add";
+import LogoutIcon from "@mui/icons-material/Logout";
 const drawerWidth = 240;
 
 export default function Home() {
@@ -24,26 +27,30 @@ export default function Home() {
   const menuItems = [
     {
       text: "Home",
-      icon: <HomeIcon />,
+      icon: <HomeIcon sx={{ color: "black" }} />,
       path: "/home",
     },
     {
       text: "Create Poll",
-      icon: <HomeIcon />,
+      icon: <AddIcon sx={{ color: "black" }} />,
       path: "/create_poll",
     },
     {
       text: "Active Poll",
-      icon: <HomeIcon />,
+      icon: <HowToVoteIcon sx={{ color: "black" }} />,
       path: "/active_poll",
     },
     {
       text: "Completed Poll",
-      icon: <HomeIcon />,
+      icon: <PollIcon sx={{ color: "black" }} />,
       path: "/completed_poll",
     },
 
-    { text: "Logout", icon: <HomeIcon />, path: "" },
+    {
+      text: "Logout",
+      icon: <LogoutIcon sx={{ color: "black" }} />,
+      path: "",
+    },
   ];
   async function handleLogout() {
     try {
