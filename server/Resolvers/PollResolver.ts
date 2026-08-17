@@ -27,6 +27,6 @@ export default class PollResolver {
     if (!ctx.user) {
       throw new GraphQLError("No authentication");
     }
-    return pollService.getPoll(args ,  ctx.user.id);
+    return pollService.getPoll(args );
   }
 }

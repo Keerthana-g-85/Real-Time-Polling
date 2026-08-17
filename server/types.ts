@@ -1,3 +1,4 @@
+import { Session } from 'inspector';
 import type { Request, Response } from "express";
 
 export interface AuthUser {

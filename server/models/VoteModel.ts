@@ -14,6 +14,7 @@ import Options from "./OptionsModel.js";
 
 @ObjectType()
 @Entity()
+@Unique(["user_id", "poll_id"])
 export default class Vote {
   @Field(() => ID)
   @PrimaryGeneratedColumn("uuid")
@@ -22,7 +23,6 @@ export default class Vote {
   @Field(() => Users)
   @ManyToOne(() => Users, { onDelete: "CASCADE" })
   @JoinColumn({ name: "user_id" })
-  @Unique(["user_id", "poll_id"])
   user_id!: Users;
 
   @Field(() => Poll)

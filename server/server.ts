@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import { connection } from "./database.js";
+import { connection, database } from "./database.js";
 import { buildSchema } from "type-graphql";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@as-integrations/express4";
@@ -14,6 +14,8 @@ import { WebSocketServer, WebSocket } from "ws";
 import VoteResolver from "./Resolvers/VoteResolver.js";
 import { joinPoll, leavePolls } from "./Service/WebSocketService.js";
 import type { AuthContext, AuthUser } from "./types.js";
+import Users from "./models/UsersModel.js";
+import Session from "./models/SessionModel.js";
 
 dotenv.config();
 const app = express();
@@ -40,7 +42,7 @@ wss.on("connection", (socket) => {
 });
 
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:5173" , credentials: true, }));
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 const schema = await buildSchema({
   resolvers: [UsersResolver, PollResolver, VoteResolver],
 });
@@ -54,15 +56,42 @@ app.use(
   expressMiddleware(server, {
     context: async ({ req, res }): Promise<AuthContext> => {
       let user: AuthUser | null = null;
-      const accesstoken = req.cookies?.accessToken;
+      const sessionId = req.cookies?.sessionId;
 
-      if (accesstoken) {
-        try {
-          user = jwt.verify(accesstoken, process.env.JW_SECRET as string) as AuthUser;
-        } catch {
-          user = null;
+      if (sessionId) {
+        const sessionRepo = database.getRepository(Session);
+        const userRepo = database.getRepository(Users);
+
+        const session = await sessionRepo.findOne({
+          where: {
+            id: sessionId,
+          },
+        });
+
+        if (session && session.expiresAt > new Date()) {
+          const user_me = await userRepo.findOne({
+            where: {
+              id: session.user_id,
+            },
+          });
+          if (user_me) {
+            user = {
+              id: user_me.id,
+              name: user_me.name,
+              email: user_me.email,
+            };
+          }
         }
       }
+
+      // const accesstoken = req.cookies?.accessToken;
+      // if (accesstoken) {
+      //   try {
+      //     user = jwt.verify(accesstoken, process.env.JW_SECRET as string) as AuthUser;
+      //   } catch {
+      //     user = null;
+      //   }
+      // }
       return { user, req, res };
     },
   }),

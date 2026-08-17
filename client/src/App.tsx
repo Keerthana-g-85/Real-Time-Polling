@@ -16,21 +16,21 @@ import { setUser } from "./redux/LoginSlice";
 export default function App() {
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   async function getUser() {
-  //     try {
-  //       const response = await useApi({
-  //         query: ME,
-  //       });
-  //       dispatch(setUser(response.me));
-  //     } catch (error) {
-  //       console.log("User not authenticated");
-  //       dispatch(setUser(null));
-  //     }
-  //   }
+  useEffect(() => {
+    async function getUser() {
+      try {
+        const response = await useApi({
+          query: ME,
+        });
+        dispatch(setUser(response.me));
+      } catch (error) {
+        console.log("User not authenticated");
+        dispatch(setUser(null));
+      }
+    }
 
-  //   getUser();
-  // }, [dispatch]);
+    getUser();
+  }, [dispatch]);
 
   return (
     <>

@@ -7,9 +7,12 @@ import jwt from "jsonwebtoken";
 import type LoginUser from "../arguments/users/LoginUserArguments.js";
 import type { Request, Response } from "express";
 import type { AuthUser } from "../types.js";
+import Session from "../models/SessionModel.js";
+import crypto from "crypto";
 
 export default class UsersService {
   private usersRepo = database.getRepository(Users);
+  private sessionRepo = database.getRepository(Session);
   async createUsers({ name, email, password }: CreateRegisterArguments) {
     try {
       const user = await this.usersRepo.findOne({ where: { email: email } });
@@ -47,31 +50,43 @@ export default class UsersService {
       if (!isPassword) {
         throw new GraphQLError("Invalid Password");
       }
-      const accesstoken = jwt.sign(
-        { id: user.id, name: user.name, email: user.email },
-        process.env.JW_SECRET as string,
-        { expiresIn: "30s" },
-      );
+      // const accesstoken = jwt.sign(
+      //   { id: user.id, name: user.name, email: user.email },
+      //   process.env.JW_SECRET as string,
+      //   { expiresIn: "2hr" },
+      // );
 
-      const refreshtoken = jwt.sign(
-        { id: user.id, name: user.name, email: user.email },
-        process.env.REFRESH_SECRET as string,
-        { expiresIn: "7d" },
-      );
-      res.cookie("accessToken", accesstoken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 30 * 1000,
+      // const refreshtoken = jwt.sign(
+      //   { id: user.id, name: user.name, email: user.email },
+      //   process.env.REFRESH_SECRET as string,
+      //   { expiresIn: "7d" },
+      // );
+      // res.cookie("accessToken", accesstoken, {
+      //   httpOnly: true,
+      //   secure: process.env.NODE_ENV === "production",
+      //   sameSite: "lax",
+      //   maxAge: 2*60*60,
+      // });
+
+      // res.cookie("refreshToken", refreshtoken, {
+      //   httpOnly: true,
+      //   secure: process.env.NODE_ENV === "production",
+      //   sameSite: "lax",
+      //   maxAge: 7 * 24 * 60 * 60 * 1000,
+      // });
+      const session = this.sessionRepo.create({
+        user_id: user.id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       });
 
-      res.cookie("refreshToken", refreshtoken, {
+      await this.sessionRepo.save(session);
+
+      res.cookie("sessionId",session.id , {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
-
+      }); 
       return {
         success: true,
         message: "User successfully logged in",

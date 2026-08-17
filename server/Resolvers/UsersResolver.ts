@@ -7,6 +7,8 @@ import LoginResponse from "../Response/LoginResponse.js";
 import LoginUser from "../arguments/users/LoginUserArguments.js";
 import type { AuthContext } from "../types.js";
 import Users from "../models/UsersModel.js";
+import Session from "../models/SessionModel.js";
+import { database } from "../database.js";
 const userService = new UsersService();
 @Resolver()
 export default class UsersResolver {
@@ -41,10 +43,26 @@ export default class UsersResolver {
     return userService.getUsers();
   }
 
+  // @Mutation(() => LoginResponse)
+  // logout(@Ctx() ctx: AuthContext) {
+  //   ctx.res.clearCookie("accessToken");
+  //   ctx.res.clearCookie("refreshToken");
+  //   return { success: true, message: "Logged out" };
+  // }
+
   @Mutation(() => LoginResponse)
-  logout(@Ctx() ctx: AuthContext) {
-    ctx.res.clearCookie("token");
-    return { success: true, message: "Logged out" };
+  async logout(@Ctx() ctx: AuthContext) {
+    const sessionId = ctx.req.cookies?.sessionId;
+    if (sessionId) {
+      await database.getRepository(Session).delete({
+        id: sessionId,
+      });
+    }
+    ctx.res.clearCookie("sessionId");
+    return {
+      success: true,
+      message: "Logged out successfully",
+    };
   }
 
   @Mutation(() => LoginResponse)
