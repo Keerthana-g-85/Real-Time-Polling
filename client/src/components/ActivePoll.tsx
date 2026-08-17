@@ -12,6 +12,7 @@ import { CREATE_VOTE } from "../graphql/Mutation/CREATE_VOTE";
 import { GET_VOTED_POLLS } from "../graphql/Query/GET_VOTED_POLLS";
 import Grid from "@mui/material/Grid";
 import { BarChart } from "@mui/x-charts";
+import PollIcon from "@mui/icons-material/Poll";
 
 export default function ActivePoll() {
   const [option, setOption] = useState("");
@@ -52,9 +53,9 @@ export default function ActivePoll() {
         refetch();
         console.log("Poll updated:", data.pollId);
         console.log("Results:", data.results);
-        // queryClient.invalidateQueries({
-        //   queryKey: ["votedPolls", id],
-        // });
+        queryClient.invalidateQueries({
+          queryKey: ["votedPolls", id],
+        });
       }
     };
     return () => {
@@ -105,63 +106,98 @@ export default function ActivePoll() {
   return (
     <>
       {activePoll?.map((data: Poll) => (
-        <Box key={data.id}>
-          <Card sx={{ mt: 2, p: 4 }}>
-            <Typography>Name : {data.poll_name}</Typography>
-            <Typography>Question :{data.question}</Typography>
-            {!votedPolls?.[data.id] ? (
-              <>
-                <RadioGroup
-                  value={option}
-                  onChange={(e) => setOption(e.target.value)}
-                >
-                  {data?.option_id?.map((i: Options) => (
-                    <FormControlLabel
-                      key={i.id}
-                      value={i.id}
-                      control={<Radio />}
-                      label={i.option}
+        <Box key={data.id} sx={{ bgcolor: "#AACDDC" }}>
+          <Card sx={{ mt: 2, p: 4, bgcolor: "#FCF8F8" }}>
+            <Box
+              sx={{
+                bgcolor: "#56B6C6",
+                color: "white",
+                padding: 2,
+                borderRadius: 3,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontFamily: "ui-monospace",
+                  fontWeight: 700,
+                  fontSize: 30,
+                }}
+              >
+                {data.poll_name}
+              </Typography>
+              <PollIcon sx={{ fontSize: 36 }} />
+            </Box>
+            <Box sx={{ p: 3, bgcolor: "#FBEFEF", borderRadius: 2, mt: 2 }}>
+              <Typography
+                sx={{
+                  fontFamily: "ui-monospace",
+                  fontSize: 25,
+                  color: "#3E5F44",
+                }}
+              >
+                {data.question}
+              </Typography>
+              {!votedPolls?.[data.id] ? (
+                <>
+                  <RadioGroup
+                    value={option}
+                    onChange={(e) => setOption(e.target.value)}
+                  >
+                    {data?.option_id?.map((i: Options) => (
+                      <FormControlLabel
+                        key={i.id}
+                        value={i.id}
+                        control={<Radio />}
+                        label={i.option}
+                      />
+                    ))}
+                  </RadioGroup>
+                  <Button
+                    variant="contained"
+                    onClick={() => voteMutation.mutate(data.id)}
+                  >
+                    Submit
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Grid size={8}>
+                    <BarChart
+                      xAxis={[
+                        {
+                          scaleType: "band",
+                          data: data.option_id.map(
+                            (option: Options) => option.option,
+                          ),
+                          tickLabelStyle: {
+                            fontSize: 14,
+                            fill: "#1E201E",
+                            fontWeight: 900,
+                          },
+                        },
+                      ]}
+                      series={[
+                        {
+                          data: data.option_id.map((option: Options) => {
+                            return (
+                              (votedPolls[data.id] as VoteCount)?.[
+                                option.option
+                              ] ?? 0
+                            );
+                          }),
+                          label: "Votes",
+                          color: "#1A3636",
+                        },
+                      ]}
+                      height={500}
+                      width={600}
                     />
-                  ))}
-                </RadioGroup>
-                <Button
-                  variant="contained"
-                  onClick={() => voteMutation.mutate(data.id)}
-                >
-                  Submit
-                </Button>
-              </>
-            ) : (
-              <>
-                
-                <Grid size={8}>
-                  <BarChart
-                    xAxis={[
-                      {
-                        scaleType: "band",
-                        data: data.option_id.map(
-                          (option: Options) => option.option,
-                        ),
-                      },
-                    ]}
-                    series={[
-                      {
-                        data: data.option_id.map((option: Options) => {
-                          return (
-                            (votedPolls[data.id] as VoteCount)?.[
-                              option.option
-                            ] ?? 0
-                          );
-                        }),
-                        label: "Votes",
-                      },
-                    ]}
-                    height={300}
-                    width={700}
-                  />
-                </Grid>
-              </>
-            )}
+                  </Grid>
+                </>
+              )}
+            </Box>
           </Card>
         </Box>
       ))}

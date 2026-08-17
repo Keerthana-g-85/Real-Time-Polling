@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import Grid from "@mui/material/Grid";
 import { BarChart } from "@mui/x-charts";
 import { GET_COMPLETED_POLL_RESULTS } from "../graphql/Query/GET_COMPLETED_POLLS";
+import PollIcon from "@mui/icons-material/Poll";
 
 type CompletedPollData = {
   poll: Poll;
@@ -33,40 +34,64 @@ export default function CompletedPoll() {
       {completedPolls?.map((data) => {
         const poll = data.poll;
         const results = data.results;
-
         return (
-          <Box key={poll.id}>
-            <Card sx={{ mt: 2, p: 4 }}>
-              <Typography>
-                Name: {poll.poll_name}
-              </Typography>
+          <Box key={poll.id} sx={{ bgcolor: "#AACDDC" }}>
+            <Card sx={{ mt: 2, p: 4, bgcolor: "#FCF8F8" }}>
+              <Box
+                sx={{
+                  bgcolor: "#56B6C6",
+                  color: "white",
+                  padding: 2,
+                  borderRadius: 3,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: "ui-monospace",
+                    fontWeight: 700,
+                    fontSize: 30,
+                  }}
+                >
+                  {poll.poll_name}
+                </Typography>
+                <PollIcon sx={{ fontSize: 36 }} />
+              </Box>
 
-              <Typography>
-                Question: {poll.question}
-              </Typography>
+              <Box sx={{ p: 3, bgcolor: "#FBEFEF", borderRadius: 2, mt: 2 }}>
+                <Typography
+                  sx={{
+                    fontFamily: "ui-monospace",
+                    fontSize: 25,
+                    color: "#3E5F44",
+                  }}
+                >
+                  {poll.question}
+                </Typography>
 
-              <Grid size={8}>
-                <BarChart
-                  xAxis={[
-                    {
-                      scaleType: "band",
-                      data: poll.option_id.map(
-                        (option) => option.option
-                      ),
-                    },
-                  ]}
-                  series={[
-                    {
-                      data: poll.option_id.map(
-                        (option) => results[option.option] ?? 0
-                      ),
-                      label: "Votes",
-                    },
-                  ]}
-                  height={300}
-                  width={700}
-                />
-              </Grid>
+                <Grid size={8}>
+                  <BarChart
+                    xAxis={[
+                      {
+                        scaleType: "band",
+                        data: poll.option_id.map((option) => option.option),
+                      },
+                    ]}
+                    series={[
+                      {
+                        data: poll.option_id.map(
+                          (option) => results[option.option] ?? 0,
+                        ),
+                        label: "Votes",
+                        color: "#1A3636",
+                      },
+                    ]}
+                    height={500}
+                    width={600}
+                  />
+                </Grid>
+              </Box>
             </Card>
           </Box>
         );

@@ -3,7 +3,6 @@ import Drawer from "@mui/material/Drawer";
 import AppBar from "@mui/material/AppBar";
 import CssBaseline from "@mui/material/CssBaseline";
 import Toolbar from "@mui/material/Toolbar";
-import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -27,28 +26,28 @@ export default function Home() {
   const menuItems = [
     {
       text: "Home",
-      icon: <HomeIcon sx={{ color: "black" }} />,
+      icon: <HomeIcon sx={{ color: "white" }} />,
       path: "/home",
     },
     {
       text: "Create Poll",
-      icon: <AddIcon sx={{ color: "black" }} />,
+      icon: <AddIcon sx={{ color: "white" }} />,
       path: "/create_poll",
     },
     {
       text: "Active Poll",
-      icon: <HowToVoteIcon sx={{ color: "black" }} />,
+      icon: <HowToVoteIcon sx={{ color: "white" }} />,
       path: "/active_poll",
     },
     {
       text: "Completed Poll",
-      icon: <PollIcon sx={{ color: "black" }} />,
+      icon: <PollIcon sx={{ color: "white" }} />,
       path: "/completed_poll",
     },
 
     {
       text: "Logout",
-      icon: <LogoutIcon sx={{ color: "black" }} />,
+      icon: <LogoutIcon sx={{ color: "white" }} />,
       path: "",
     },
   ];
@@ -62,7 +61,14 @@ export default function Home() {
   }
   return (
     <>
-      <Box sx={{ display: "flex" }}>
+      <Box
+        sx={{
+          display: "flex",
+          bgcolor: "#325E6A",
+          width: "100vw",
+          minHeight: "100vh",
+        }}
+      >
         <CssBaseline />
         <AppBar
           position="fixed"
@@ -70,6 +76,7 @@ export default function Home() {
             width: `calc(100% - ${drawerWidth}px)`,
             ml: `${drawerWidth}px`,
             zIndex: (theme) => theme.zIndex.drawer + 1,
+            bgcolor:"#2f2e2e"
           }}
         >
           <Toolbar>
@@ -89,9 +96,12 @@ export default function Home() {
           sx={{
             width: drawerWidth,
             flexShrink: 0,
+
             "& .MuiDrawer-paper": {
               width: drawerWidth,
               boxSizing: "border-box",
+              bgcolor:"#2f2e2e",
+              color: "white",
             },
           }}
         >
@@ -100,7 +110,7 @@ export default function Home() {
           <Box sx={{ overflow: "auto" }}>
             <List>
               {menuItems.map((item) => (
-                <ListItem key={item.text}>
+                <ListItem key={item.text} >
                   <ListItemButton
                     onClick={() => {
                       if (item.text === "Logout") {
@@ -111,12 +121,12 @@ export default function Home() {
                     }}
                   >
                     <ListItemIcon>{item.icon}</ListItemIcon>
+
                     <ListItemText primary={item.text} />
                   </ListItemButton>
                 </ListItem>
               ))}
             </List>
-            <Divider />
           </Box>
         </Drawer>
 
