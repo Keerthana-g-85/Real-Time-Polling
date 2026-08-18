@@ -31,23 +31,41 @@ export default function CompletedPoll() {
   }
 
   const { data } = useQuery({
-    queryKey: ["completedPolls", id , page],
+    queryKey: ["completedPolls", id, page],
     queryFn: getCompletedPollResults,
   });
   const completedPolls = data?.completedPolls;
 
   return (
     <>
-      <Grid container spacing={2}>
+      <Grid
+        container
+        spacing={{
+          xs: 2,
+          sm: 3,
+        }}
+      >
         {completedPolls?.map((data: CompletedPollData) => {
           const poll = data.poll;
           const results = data.results;
           return (
-            <Box key={poll.id}>
-              <Card sx={{ mt: 2, p: 4, bgcolor: "#FCF8F8" }}>
+            <Grid size={{ xs: 12, md: 6 }} key={poll.id}>
+              <Card
+                sx={{
+                  mt: 2,
+                  p: {
+                    xs: 2,
+                    sm: 3,
+                    md: 4,
+                  },
+                  bgcolor: "#FCF8F8",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
                 <Box
                   sx={{
-                    bgcolor: "#56B6C6",
+                    bgcolor: "#5669c6",
                     color: "white",
                     padding: 2,
                     borderRadius: 3,
@@ -59,7 +77,11 @@ export default function CompletedPoll() {
                     sx={{
                       fontFamily: "ui-monospace",
                       fontWeight: 700,
-                      fontSize: 30,
+                      fontSize: {
+                        xs: 18,
+                        sm: 22,
+                        md: 26,
+                      },
                     }}
                   >
                     {poll.poll_name}
@@ -67,39 +89,53 @@ export default function CompletedPoll() {
                   <PollIcon sx={{ fontSize: 36 }} />
                 </Box>
 
-                <Box sx={{ p: 3, bgcolor: "#FBEFEF", borderRadius: 2, mt: 2 }}>
+                <Box
+                  sx={{
+                    p: 3,
+                    borderRadius: 2,
+                    mt: 2,
+                    width: "100%",
+                  }}
+                >
                   <Typography
                     sx={{
                       fontFamily: "ui-monospace",
                       fontSize: 25,
-                      color: "#3E5F44",
+                      color: "#171931",
                     }}
                   >
                     {poll.question}
                   </Typography>
-
-                  <BarChart
-                    xAxis={[
-                      {
-                        scaleType: "band",
-                        data: poll.option_id.map((option) => option.option),
-                      },
-                    ]}
-                    series={[
-                      {
-                        data: poll.option_id.map(
-                          (option) => results[option.option] ?? 0,
-                        ),
-                        label: "Votes",
-                        color: "#1A3636",
-                      },
-                    ]}
-                    height={500}
-                    width={600}
-                  />
+                  <Box
+                    sx={{
+                      width: "100%",
+                      overflowX: "auto",
+                    }}
+                  >
+                    <BarChart
+                      yAxis={[
+                        {
+                          scaleType: "band",
+                          data: poll.option_id.map((option) => option.option),
+                        },
+                      ]}
+                      series={[
+                        {
+                          data: poll.option_id.map(
+                            (option) => results[option.option] ?? 0,
+                          ),
+                          label: "Votes",
+                          color: "#7384e5db",
+                        },
+                      ]}
+                      layout="horizontal"
+                      height={500}
+                      width={600}
+                    />
+                  </Box>
                 </Box>
               </Card>
-            </Box>
+            </Grid>
           );
         })}
       </Grid>

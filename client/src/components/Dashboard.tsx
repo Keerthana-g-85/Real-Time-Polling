@@ -40,7 +40,17 @@ export default function Dashboard() {
   ];
 
   return (
-    <Box>
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: "100%",
+        p: {
+          xs: 2,
+          sm: 3,
+          md: 4,
+        },
+      }}
+    >
       <Typography
         variant="h4"
         sx={{
@@ -54,12 +64,18 @@ export default function Dashboard() {
       <Grid container spacing={2}>
         {cards?.map((card) => (
           <Grid
+            key={card.title}
             size={{
+              xs: 12,
+              sm: 6,
               md: 3,
             }}
-            key={card.title}
           >
-            <Card>
+            <Card
+              sx={{
+                height: "100%",
+              }}
+            >
               <CardContent>
                 <Typography>{card.title}</Typography>
 
@@ -85,8 +101,17 @@ export default function Dashboard() {
             md: 6,
           }}
         >
-          <Card>
-            <CardContent>
+          <Card
+            sx={{
+              height: "100%",
+            }}
+          >
+            <CardContent
+              sx={{
+                width: "100%",
+                boxSizing: "border-box",
+              }}
+            >
               <Typography
                 variant="h6"
                 sx={{
@@ -97,26 +122,38 @@ export default function Dashboard() {
                 Poll Status
               </Typography>
 
-              <PieChart
-                series={[
-                  {
-                    data: [
-                      {
-                        id: 0,
-                        value: data?.activePolls,
-                        label: "Active",
-                      },
-                      {
-                        id: 1,
-                        value: data?.completedPolls,
-                        label: "Completed",
-                      },
-                    ],
-                  },
-                ]}
-                width={500}
-                height={400}
-              />
+              <Box
+                sx={{
+                  width: "100%",
+                  overflow: "hidden",
+
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <PieChart
+                  series={[
+                    {
+                      data: [
+                        {
+                          id: 0,
+                          value: data?.activePolls,
+                          label: "Active",
+                          color: "#6ddc52db",
+                        },
+                        {
+                          id: 1,
+                          value: data?.completedPolls,
+                          label: "Completed",
+                          color: "#7384e5db",
+                        },
+                      ],
+                    },
+                  ]}
+                  // width={500}
+                  height={400}
+                />
+              </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -126,8 +163,17 @@ export default function Dashboard() {
             md: 6,
           }}
         >
-          <Card>
-            <CardContent>
+          <Card
+            sx={{
+              height: "100%",
+            }}
+          >
+            <CardContent
+              sx={{
+                width: "100%",
+                boxSizing: "border-box",
+              }}
+            >
               <Typography
                 variant="h6"
                 sx={{
@@ -137,23 +183,32 @@ export default function Dashboard() {
               >
                 My Poll Activity
               </Typography>
-
-              <BarChart
-                xAxis={[
-                  {
-                    scaleType: "band",
-                    data: ["Created", "Allowed"],
-                  },
-                ]}
-                series={[
-                  {
-                    data: [data?.createdByMe, data?.allowedToMe],
-                    label: "Polls",
-                  },
-                ]}
-                width={500}
-                height={371}
-              />
+              <Box
+                sx={{
+                  width: "100%",
+                  overflow: "hidden",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <BarChart
+                  xAxis={[
+                    {
+                      scaleType: "band",
+                      data: ["Created", "Allowed"],
+                    },
+                  ]}
+                  series={[
+                    {
+                      data: [data?.createdByMe, data?.allowedToMe],
+                      color: "#7384e5db",
+                      label: "Polls",
+                    },
+                  ]}
+                  // width={500}
+                  height={371}
+                />
+              </Box>
             </CardContent>
           </Card>
         </Grid>

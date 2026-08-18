@@ -130,11 +130,21 @@ export default function Register() {
 
   return (
     <>
-      <Grid container spacing={2} sx={{ bgcolor: "#e3e7f3" }}>
+      <Grid
+        container
+        spacing={2}
+        sx={{ bgcolor: "#e3e7f3", minHeight: "100vh", width: "100%" }}
+      >
         <Grid
           size={{
             xs: 12,
             md: 6,
+          }}
+          sx={{
+            display: {
+              xs: "none",
+              md: "block",
+            },
           }}
         >
           <Box
@@ -148,7 +158,32 @@ export default function Register() {
             }}
           ></Box>
         </Grid>
-        <Grid>
+        <Grid
+          size={{
+            xs: 12,
+            md: 6,
+          }}
+          sx={{
+            minHeight: "100vh",
+
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+
+            px: {
+              xs: 2,
+              sm: 4,
+              md: 5,
+              lg: 8,
+            },
+
+            py: {
+              xs: 3,
+              sm: 4,
+              md: 2,
+            },
+          }}
+        >
           <Box
             sx={{
               display: "flex",
@@ -161,14 +196,34 @@ export default function Register() {
             <Paper
               elevation={1}
               sx={{
-                p: 6,
-                borderRadius: 3,
-                width: 500,
-                height: 430,
-                ml: 20,
+                width: "100%",
+
+                maxWidth: {
+                  xs: "100%",
+                  sm: 500,
+                  md: 520,
+                },
+
+                p: {
+                  xs: 3,
+                  sm: 4,
+                  md: 5,
+                },
+
+                borderRadius: {
+                  xs: 2,
+                  sm: 3,
+                },
+
+                boxSizing: "border-box",
               }}
             >
-              <Stack spacing={4}>
+              <Stack
+                spacing={{
+                  xs: 3,
+                  sm: 4,
+                }}
+              >
                 <Box
                   sx={{
                     display: "flex",
@@ -185,6 +240,11 @@ export default function Register() {
                       color: "#517cf1",
                       fontFamily: '"Segoe UI"',
                       fontWeight: "600",
+                      fontSize: {
+                        xs: "1.7rem",
+                        sm: "2rem",
+                        md: "2.2rem",
+                      },
                     }}
                   >
                     Welcome to Live VoteFlow
@@ -200,9 +260,7 @@ export default function Register() {
                     Sign in to share your opinion and participate in live polls.
                   </Typography>
                 </Box>
-                <Box
-                  sx={{ display: "flex", alignItems: "flex-end", gap: 2, p: 0 }}
-                >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <PersonIcon />
                   <TextField
                     placeholder="Name"
@@ -220,9 +278,7 @@ export default function Register() {
                     }}
                   />
                 </Box>
-                <Box
-                  sx={{ display: "flex", alignItems: "flex-end", gap: 2, p: 0 }}
-                >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <MailIcon />
                   <TextField
                     placeholder="Email"
@@ -240,12 +296,10 @@ export default function Register() {
                     }}
                   />
                 </Box>
-                <Box
-                  sx={{ display: "flex", alignItems: "flex-end", gap: 2, p: 0 }}
-                >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <LockIcon />
                   <TextField
-                  placeholder="Password"
+                    placeholder="Password"
                     fullWidth
                     id={err.password ? "outlined-error" : "outlined-basic"}
                     variant="outlined"

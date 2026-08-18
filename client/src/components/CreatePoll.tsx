@@ -1,5 +1,5 @@
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
-import {  useState } from "react";
+import { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import dayjs from "dayjs";
 import { DemoItem } from "@mui/x-date-pickers/internals/demo";
@@ -32,7 +32,7 @@ export default function CreatePoll() {
         question: poll.question,
         expire_time: poll.expireTime,
         options: options,
-        allowed_users : allowedusers,
+        allowed_users: allowedusers,
       },
     });
     console.log(response);
@@ -64,7 +64,18 @@ export default function CreatePoll() {
           mt: 10,
         }}
       >
-        <Paper elevation={4} sx={{ width: 600, height: 700, p: 4 }}>
+        <Paper
+          elevation={4}
+          sx={{
+            
+            p: 4,
+            width: "100%",
+            maxWidth: {
+              xs: "100%",
+              sm: 600,
+            },
+          }}
+        >
           <Typography>Name</Typography>
           <TextField
             fullWidth

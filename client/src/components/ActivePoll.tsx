@@ -23,7 +23,7 @@ export default function ActivePoll() {
   const start = (page - 1) * end;
   const queryClient = useQueryClient();
   const id = useSelector((state: any) => state?.login?.user?.id);
-
+  const colors = ["#8884d8", "#82ca9d", "#ffc658", "#ff5858"];
   async function getActivePolls() {
     const response = await useApi({
       query: GET_ACTIVE_POOLS,
@@ -118,7 +118,11 @@ export default function ActivePoll() {
             <Card
               sx={{
                 mt: 2,
-                p: 4,
+                p: {
+                  xs: 2,
+                  sm: 3,
+                  md: 4,
+                },
                 bgcolor: "#FCF8F8",
                 width: "100%",
                 height: "100%",
@@ -126,7 +130,7 @@ export default function ActivePoll() {
             >
               <Box
                 sx={{
-                  bgcolor: "#56B6C6",
+                  bgcolor: "#5669c6",
                   color: "white",
                   padding: 2,
                   borderRadius: 3,
@@ -138,7 +142,11 @@ export default function ActivePoll() {
                   sx={{
                     fontFamily: "ui-monospace",
                     fontWeight: 700,
-                    fontSize: 30,
+                    fontSize: {
+                      xs: 18,
+                      sm: 22,
+                      md: 26,
+                    },
                   }}
                 >
                   {data.poll_name}
@@ -148,7 +156,6 @@ export default function ActivePoll() {
               <Box
                 sx={{
                   p: 3,
-                  bgcolor: "#FBEFEF",
                   borderRadius: 2,
                   mt: 2,
                   width: "100%",
@@ -158,7 +165,7 @@ export default function ActivePoll() {
                   sx={{
                     fontFamily: "ui-monospace",
                     fontSize: 25,
-                    color: "#3E5F44",
+                    color: "#171931",
                   }}
                 >
                   {data.question}
@@ -183,42 +190,62 @@ export default function ActivePoll() {
                     <Button
                       variant="contained"
                       onClick={() => voteMutation.mutate(data.id)}
+                      sx={{
+                        bgcolor: "#6d92f7",
+                        width: {
+                          xs: "100%",
+                          sm: 140,
+                        },
+                        borderRadius: 3,
+                        mb: 3,
+                      }}
                     >
                       Submit
                     </Button>
                   </>
                 ) : (
                   <>
-                    <BarChart
-                      xAxis={[
-                        {
-                          scaleType: "band",
-                          data: data.option_id.map(
-                            (option: Options) => option.option,
-                          ),
-                          tickLabelStyle: {
-                            fontSize: 14,
-                            fill: "#1E201E",
-                            fontWeight: 900,
+                    <Box
+                      sx={{
+                        width: "100%",
+                        overflowX: "auto",
+                      }}
+                    >
+                      <BarChart
+                        yAxis={[
+                          {
+                            scaleType: "band",
+                            data: data.option_id.map(
+                              (option: Options) => option.option,
+                            ),
+                            colorMap: {
+                              type: "ordinal",
+                              colors: colors,
+                            },
+                            tickLabelStyle: {
+                              fontSize: 14,
+                              fill: "#1E201E",
+                              fontWeight: 900,
+                            },
                           },
-                        },
-                      ]}
-                      series={[
-                        {
-                          data: data.option_id.map((option: Options) => {
-                            return (
-                              (votedPolls[data.id] as VoteCount)?.[
-                                option.option
-                              ] ?? 0
-                            );
-                          }),
-                          label: "Votes",
-                          color: "#1A3636",
-                        },
-                      ]}
-                      height={500}
-                      width={600}
-                    />
+                        ]}
+                        series={[
+                          {
+                            data: data.option_id.map((option: Options) => {
+                              return (
+                                (votedPolls[data.id] as VoteCount)?.[
+                                  option.option
+                                ] ?? 0
+                              );
+                            }),
+                            label: "Votes",
+                          },
+                        ]}
+                        layout="horizontal"
+                        height={500}
+                        width={600}
+                      />
+                    </Box>
                   </>
                 )}
               </Box>
