@@ -124,4 +124,75 @@ export default class PollService {
       throw new GraphQLError("Error while getting polls");
     }
   }
+
+  async getDashboard(user_id: string) {
+  try {
+    const polls = await this.pollRepo.find({
+      relations: {
+        user_id: true,
+        allowed_users: {
+          user_id: true,
+        },
+      },
+    });
+
+    for (const poll of polls) {
+      if (
+        poll.expire_time <= new Date() &&
+        poll.status === "Active"
+      ) {
+        poll.status = "Completed";
+        await this.pollRepo.save(poll);
+      }
+    }
+
+    const accessPolls = polls.filter(
+      (poll) =>
+        poll.user_id.id === user_id ||
+        poll.allowed_users.some(
+          (allowedUser) =>
+            allowedUser.user_id.id === user_id,
+        ),
+    );
+
+    const activePolls = accessPolls.filter(
+      (poll) => poll.status === "Active",
+    );
+
+    const completedPolls = accessPolls.filter(
+      (poll) => poll.status === "Completed",
+    );
+
+    const createdByMe = polls.filter(
+      (poll) => poll.user_id.id === user_id,
+    );
+
+    const allowedToMe = polls.filter(
+      (poll) =>
+        poll.allowed_users.some(
+          (allowedUser) =>
+            allowedUser.user_id.id === user_id,
+        ),
+    );
+
+    return {
+      success: true,
+      message: "Dashboard data",
+      activePolls: activePolls.length,
+      completedPolls: completedPolls.length,
+      createdByMe: createdByMe.length,
+      allowedToMe: allowedToMe.length,
+    };
+  } catch (error) {
+    console.log(error);
+
+    if (error instanceof GraphQLError) {
+      throw error;
+    }
+
+    throw new GraphQLError(
+      "Error while getting dashboard",
+    );
+  }
+}
 }

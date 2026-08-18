@@ -5,6 +5,7 @@ import CreatePollArguments from "../arguments/poll/CreatePollArguments.js";
 import PollResponse from "../Response/PollResponse.js";
 import GetPollArguments from "../arguments/poll/GetPoll.js";
 import type { AuthContext } from "../types.js";
+import DashboardResponse from "../Response/DashboardResponse.js";
 const pollService = new PollService();
 @Resolver()
 export default class PollResolver {
@@ -16,7 +17,7 @@ export default class PollResolver {
     if (!ctx.user) {
       throw new GraphQLError("No authentication");
     }
-    return pollService.createPoll(input ,  ctx.user.id);
+    return pollService.createPoll(input, ctx.user.id);
   }
 
   @Query(() => PollResponse)
@@ -27,6 +28,14 @@ export default class PollResolver {
     if (!ctx.user) {
       throw new GraphQLError("No authentication");
     }
-    return pollService.getPoll(args );
+    return pollService.getPoll(args);
+  }
+
+  @Query(() => DashboardResponse)
+  getDashboard(@Ctx() ctx: AuthContext) {
+    if (!ctx.user) {
+      throw new GraphQLError("No authentication");
+    }
+    return pollService.getDashboard(ctx.user.id);
   }
 }

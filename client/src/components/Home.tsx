@@ -27,7 +27,7 @@ export default function Home() {
     {
       text: "Home",
       icon: <HomeIcon sx={{ color: "white" }} />,
-      path: "/home",
+      path: "/dashboard",
     },
     {
       text: "Create Poll",

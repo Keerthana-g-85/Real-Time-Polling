@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import useApi from "./Api";
 import { ME } from "./graphql/Query/Me";
 import { setUser } from "./redux/LoginSlice";
+import Dashboard from "./components/Dashboard";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -30,7 +31,7 @@ export default function App() {
     }
 
     getUser();
-  }, [dispatch]);
+  }, []);
 
   return (
     <>
@@ -38,14 +39,15 @@ export default function App() {
         <Routes>
           <Route element={<PublicRoute />}>
             <Route path="/register" element={<Register />} />
+             <Route path="/" element={<Login />} />
           </Route>
-          <Route path="/" element={<Login />} />
           <Route element={<ProtectedRouter />}>
             <Route element={<Home />}>
               <Route path="/home" element={<Home />} />
               <Route path="/create_poll" element={<CreatePoll />} />
               <Route path="/active_poll" element={<ActivePoll />} />
               <Route path="/completed_poll" element={<CompletedPoll />} />
+              <Route path="/dashboard" element={<Dashboard/>}/>
             </Route>
           </Route>
         </Routes>

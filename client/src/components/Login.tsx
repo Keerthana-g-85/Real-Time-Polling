@@ -62,7 +62,7 @@ export default function Login() {
     mutationFn: userLogin,
     onSuccess: (me) => {
       dispatch(setUser(me));
-      navigate("/home");
+      navigate("/dashboard");
     },
   });
 
