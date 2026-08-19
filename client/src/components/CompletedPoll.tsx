@@ -26,7 +26,6 @@ export default function CompletedPoll() {
         end,
       },
     });
-    console.log(response.getCompletedPollResults);
     return response.getCompletedPollResults;
   }
 

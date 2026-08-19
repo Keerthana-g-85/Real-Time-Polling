@@ -51,21 +51,19 @@ export default function Login() {
         userLoginMutation.mutate();
       }
     } catch (error) {
-      console.log(error);
+
       throw error;
     }
   }
   async function userLogin() {
-    const response = await useApi({
+   await useApi({
       query: LOGIN_USER,
       input: {
         email: login.email,
         password: login.password,
       },
     });
-    console.log(response);
     const meResponse = await useApi({ query: ME });
-    console.log(meResponse);
     return meResponse.me;
   }
 

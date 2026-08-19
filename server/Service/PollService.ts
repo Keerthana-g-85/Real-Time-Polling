@@ -28,7 +28,6 @@ export default class PollService {
         const allowedUserRepo = manager.getRepository(AllowedUser);
 
         const user = await usersRepo.findOneBy({ id: user_id });
-        // console.log(user);
         if (!user) {
           throw new GraphQLError("No user exist");
         }
@@ -71,7 +70,6 @@ export default class PollService {
         };
       });
     } catch (error) {
-      console.log(error);
       if (error instanceof GraphQLError) {
         throw error;
       }
@@ -115,7 +113,7 @@ export default class PollService {
         total_pages,
       };
     } catch (error) {
-      console.log(error);
+      
 
       if (error instanceof GraphQLError) {
         throw error;
@@ -184,7 +182,7 @@ export default class PollService {
       allowedToMe: allowedToMe.length,
     };
   } catch (error) {
-    console.log(error);
+    
 
     if (error instanceof GraphQLError) {
       throw error;

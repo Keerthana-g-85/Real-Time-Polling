@@ -25,18 +25,14 @@ const wss = new WebSocketServer({
 });
 app.use(cookieParser());
 wss.on("connection", (socket) => {
-  console.log("client connected");
 
   socket.on("message", (message) => {
     const data = JSON.parse(message.toString());
     if (data.type === "POLL") {
       joinPoll(data.pollId, socket);
     }
-    console.log(data.type);
-    console.log(data.pollId);
   });
   socket.on("close", () => {
-    console.log("client disconnected");
     leavePolls(socket);
   });
 });

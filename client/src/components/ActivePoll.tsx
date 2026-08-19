@@ -29,7 +29,6 @@ export default function ActivePoll() {
       query: GET_ACTIVE_POOLS,
       variables: { status: "Active", start, end },
     });
-    console.log(response.getPoll.polls);
     return response.getPoll;
   }
   const { data, refetch } = useQuery({
@@ -44,7 +43,6 @@ export default function ActivePoll() {
     const socket = new WebSocket("ws://localhost:3060");
     socket.onopen = () => {
       activePoll.forEach((poll: Poll) => {
-        console.log("Joining poll:", poll.id);
         socket.send(
           JSON.stringify({
             type: "POLL",
@@ -58,8 +56,6 @@ export default function ActivePoll() {
 
       if (data.type === "POLL_UPDATED") {
         refetch();
-        console.log("Poll updated:", data.pollId);
-        console.log("Results:", data.results);
         queryClient.invalidateQueries({
           queryKey: ["votedPolls", id],
         });
@@ -74,7 +70,6 @@ export default function ActivePoll() {
     const response = await useApi({
       query: GET_VOTED_POLLS,
     });
-    console.log(response.getVoteUserPoll);
     return response.getVoteUserPoll.results;
   }
 
@@ -85,7 +80,6 @@ export default function ActivePoll() {
 
   async function handleSubmit(poll_id: string) {
     if (!option) {
-      console.log("no option selected");
       return;
     }
     const response = await useApi({
@@ -97,7 +91,6 @@ export default function ActivePoll() {
         },
       },
     });
-    console.log(response);
     return response;
   }
 

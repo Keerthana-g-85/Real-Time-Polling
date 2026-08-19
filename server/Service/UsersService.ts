@@ -32,7 +32,7 @@ export default class UsersService {
         message: "User successfully registered",
       };
     } catch (error) {
-      console.log(error);
+      
       if (error instanceof GraphQLError) {
         throw error;
       }
@@ -92,7 +92,7 @@ export default class UsersService {
         message: "User successfully logged in",
       };
     } catch (error) {
-      console.log(error);
+      
       if (error instanceof GraphQLError) {
         throw error;
       }
@@ -109,7 +109,7 @@ export default class UsersService {
         users,
       };
     } catch (error) {
-      console.log(error);
+      
       if (error instanceof GraphQLError) {
         throw error;
       }

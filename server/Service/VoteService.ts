@@ -47,7 +47,6 @@ export default class VoteService {
         option_id: option,
       });
       await this.voteRepo.save(vote);
-      console.log("Vote saved, notifying for the :", poll_id, poll.poll_name);
 
       const votes = await this.voteRepo.find({
         where: {
@@ -57,7 +56,6 @@ export default class VoteService {
           option_id: true,
         },
       });
-      console.log(votes);
 
       //   const results= {};
 
@@ -90,7 +88,6 @@ export default class VoteService {
         message: "Vote registered",
       };
     } catch (error) {
-      console.error(error);
       if (error instanceof GraphQLError) {
         throw error;
       }
@@ -152,7 +149,6 @@ export default class VoteService {
         results,
       };
     } catch (error) {
-      console.error(error);
       throw new GraphQLError("Error while getting voted polls");
     }
   }
@@ -215,8 +211,6 @@ export default class VoteService {
         total_pages,
       };
     } catch (error) {
-      console.error(error);
-
       if (error instanceof GraphQLError) {
         throw error;
       }

@@ -30,6 +30,9 @@ import { useState } from "react";
 const drawerWidth = 240;
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
+  [theme.breakpoints.down("sm")]: {
+    width: "100%",
+  },
   transition: theme.transitions.create("width", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
@@ -76,6 +79,9 @@ const AppBar = styled(MuiAppBar, {
       style: {
         marginLeft: drawerWidth,
         width: `calc(100% - ${drawerWidth}px)`,
+        [theme.breakpoints.down("sm")]: {
+          width: "0%",
+        },
         transition: theme.transitions.create(["width", "margin"], {
           easing: theme.transitions.easing.sharp,
           duration: theme.transitions.duration.enteringScreen,
@@ -209,12 +215,8 @@ export default function Home() {
 
         <Drawer variant="permanent" open={open}>
           <DrawerHeader>
-            <IconButton onClick={handleDrawerClose}>
-              {theme.direction === "rtl" ? (
-                <ChevronRightIcon />
-              ) : (
-                <ChevronLeftIcon />
-              )}
+            <IconButton sx={{ color: "white" }} onClick={handleDrawerClose}>
+              <ChevronLeftIcon />
             </IconButton>
           </DrawerHeader>
 

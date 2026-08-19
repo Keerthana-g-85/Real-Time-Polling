@@ -23,6 +23,21 @@ export default function CreatePoll() {
   });
   const [options, setOptions] = useState(["", ""]);
   const [allowedusers, setAllowedUsers] = useState<string[]>([]);
+  const [err, setErr] = useState({
+    name: false,
+    question: false,
+    options: false,
+    expireTime: false,
+    allowedUsers: false,
+  });
+
+  const [message, setMessage] = useState({
+    name: "",
+    question: "",
+    options: "",
+    expireTime: "",
+    allowedUsers: "",
+  });
 
   async function handleCreatePoll() {
     const response = await useApi({
@@ -35,7 +50,6 @@ export default function CreatePoll() {
         allowed_users: allowedusers,
       },
     });
-    console.log(response);
     return response;
   }
   const optonsMutation = useMutation({
@@ -45,7 +59,6 @@ export default function CreatePoll() {
 
   async function handleGetUsers() {
     const response = await useApi({ query: GET_USERS, input: {} });
-    console.log(response.getUsers.users);
     return response.getUsers.users;
   }
 
@@ -67,7 +80,6 @@ export default function CreatePoll() {
         <Paper
           elevation={4}
           sx={{
-            
             p: 4,
             width: "100%",
             maxWidth: {
@@ -80,20 +92,27 @@ export default function CreatePoll() {
           <TextField
             fullWidth
             value={poll.name}
-            onChange={(e) =>
-              setPoll((prev) => ({ ...prev, name: e.target.value }))
-            }
+            error={err.name}
+            helperText={message.name}
+            onChange={(e) => {
+              setPoll((prev) => ({ ...prev, name: e.target.value }));
+              setErr((prev) => ({ ...prev, name: false }));
+              setMessage((prev) => ({ ...prev, name: "" }));
+            }}
           />
 
           <Typography>Question</Typography>
           <TextField
             fullWidth
             value={poll.question}
+            error={err.question}
+            helperText={message.question}
             onChange={(e) => {
               setPoll((prev) => ({ ...prev, question: e.target.value }));
+              setErr((prev) => ({ ...prev, question: false }));
+              setMessage((prev) => ({ ...prev, question: "" }));
             }}
           />
-
           <Typography>Options</Typography>
           {options.map((item, index) => (
             <Box sx={{ display: "flex" }} key={index}>
@@ -123,6 +142,11 @@ export default function CreatePoll() {
               )}
             </Box>
           ))}
+          {err.options && (
+            <Typography color="error" variant="caption">
+              {message.options}
+            </Typography>
+          )}
           <Button
             variant="contained"
             onClick={() => setOptions((prev) => [...prev, ""])}
@@ -136,27 +160,36 @@ export default function CreatePoll() {
               <DateTimePicker
                 disablePast
                 views={["year", "month", "day", "hours", "minutes"]}
-                defaultValue={dayjs()}
                 value={poll.expireTime}
                 onChange={(e) => {
                   setPoll((prev) => ({
                     ...prev,
                     expireTime: e ?? prev.expireTime,
                   }));
+
+                  setErr((prev) => ({ ...prev, expireTime: false }));
+                  setMessage((prev) => ({ ...prev, expireTime: "" }));
                 }}
               />
+
+              {err.expireTime && (
+                <Typography color="error" variant="caption">
+                  {message.expireTime}
+                </Typography>
+              )}
             </DemoItem>
           </LocalizationProvider>
 
           <Autocomplete
             multiple
-            options={users}
-            value={(users ?? [])?.filter((user: Users) =>
+            options={users ?? []}
+            value={(users ?? []).filter((user: Users) =>
               allowedusers.includes(user.id),
             )}
             onChange={(_, newValue) => {
               setAllowedUsers(newValue.map((user) => user.id));
-              console.log(users);
+              setErr((prev) => ({ ...prev, allowedUsers: false }));
+              setMessage((prev) => ({ ...prev, allowedUsers: "" }));
             }}
             disableCloseOnSelect
             getOptionLabel={(option: Users) => option.name}

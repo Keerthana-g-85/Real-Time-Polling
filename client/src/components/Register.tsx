@@ -105,7 +105,6 @@ export default function Register() {
         createUserMutation.mutate();
       }
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }

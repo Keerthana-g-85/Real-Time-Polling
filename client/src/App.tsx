@@ -25,7 +25,6 @@ export default function App() {
         });
         dispatch(setUser(response.me));
       } catch (error) {
-        console.log("User not authenticated");
         dispatch(setUser(null));
       }
     }

@@ -24,9 +24,7 @@ export const database = new DataSource({
 export const connection = async () => {
   try {
     await database.initialize();
-    console.log("database connected");
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
