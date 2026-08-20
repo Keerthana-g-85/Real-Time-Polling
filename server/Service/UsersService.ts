@@ -32,7 +32,6 @@ export default class UsersService {
         message: "User successfully registered",
       };
     } catch (error) {
-      
       if (error instanceof GraphQLError) {
         throw error;
       }
@@ -81,18 +80,17 @@ export default class UsersService {
 
       await this.sessionRepo.save(session);
 
-      res.cookie("sessionId",session.id , {
+      res.cookie("sessionId", session.id, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
-      }); 
+      });
       return {
         success: true,
         message: "User successfully logged in",
       };
     } catch (error) {
-      
       if (error instanceof GraphQLError) {
         throw error;
       }
@@ -109,7 +107,6 @@ export default class UsersService {
         users,
       };
     } catch (error) {
-      
       if (error instanceof GraphQLError) {
         throw error;
       }
@@ -148,5 +145,17 @@ export default class UsersService {
       }
       throw new GraphQLError("Error while getting refresh token ");
     }
+  }
+}
+const totalAttempts = new Map();
+function loginAttempts(ip: string) {
+  const now = Date.now();
+  const windowMs = 60 * 1000;
+  const maxAttempts = 5;
+  const userIp = totalAttempts.has(ip);
+  if (!userIp) {
+    totalAttempts.set(ip, 1)
+  }else {
+
   }
 }

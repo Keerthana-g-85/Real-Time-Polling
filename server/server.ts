@@ -16,6 +16,7 @@ import { joinPoll, leavePolls } from "./Service/WebSocketService.js";
 import type { AuthContext, AuthUser } from "./types.js";
 import Users from "./models/UsersModel.js";
 import Session from "./models/SessionModel.js";
+import rateLimit from "express-rate-limit";
 
 dotenv.config();
 const app = express();
@@ -45,6 +46,15 @@ const schema = await buildSchema({
 const server = new ApolloServer({ schema });
 await server.start();
 await connection();
+const limiter = rateLimit({
+  windowMs : 60 *1000,
+  limit : 10 ,
+  message :{
+    success : false ,
+    message : "Too many requests , try after some time "
+  }
+})
+app.use(limiter)
 // app.use("/graphql", express.json(), expressMiddleware(server));
 app.use(
   "/graphql",
